@@ -1,0 +1,107 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using Platformer.Mechanics;
+using UnityEngine;
+
+public class PlayerPlatformerController : PhysicsObject
+{
+    public float maxSpeed = 7f;
+    public float jumpTakeoffSpeed = 7f;
+    public float shiftModifier = 1.5f;
+
+    public int maxHealth = 3;
+    private int health;
+    public bool isInvincible;
+    private HealthSystem playerHealth;
+
+    private SpriteRenderer spriteRenderer;
+    private Color hurtColor = Color.yellow;
+    private Color normalColor;
+
+
+    //private Animator animator;
+
+    // Start is called before the first frame update
+    void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        normalColor = spriteRenderer.color;
+        // animator = GetComponent<Animator>();
+    }
+
+    void Start() {
+        playerHealth = new HealthSystem(maxHealth);
+    }
+
+    protected override void ComputeVelocity()
+    {
+        Vector2 move = Vector2.zero;
+
+        move.x = Input.GetAxis("Horizontal");
+
+        if(Input.GetButtonDown("Jump") && grounded)
+        {
+            velocity.y = jumpTakeoffSpeed;
+        }
+        else if(Input.GetButtonUp("Jump"))
+        {
+            if(velocity.y > 0)
+            {
+                velocity.y = velocity.y * .5f;
+            }
+        }
+        if(Input.GetButtonDown("Fire3"))
+        {
+            maxSpeed = (float)maxSpeed * shiftModifier;
+        }
+        else if(Input.GetButtonUp("Fire3"))
+        {
+            maxSpeed = (float)maxSpeed / shiftModifier;
+        }
+
+        // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
+        // if(flipSprite)
+        // {
+        //     spriteRenderer.flipX = !spriteRenderer.flipX;
+        // }
+
+        // animator.SetBool("grounded", grounded);
+        // animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
+
+        targetVelocity = move * maxSpeed;
+    }
+
+    void OnCollisionEnter2D(Collision2D other) {
+        BasicEnemy enemy = other.gameObject.GetComponent<BasicEnemy>();
+        //all a bit janky. Physics isn't quite right
+        if(enemy){
+            //print("Velocity before " + rb2D.velocity);
+            ContactPoint2D hitPoint = other.GetContact(0);
+            // print(hitPoint.normal);
+            Vector2 bounce = new Vector2(hitPoint.normal.x, .5f);
+            rb2D.velocity = bounce.normalized * 8;
+            //print("Velocity after " + rb2D.velocity);
+        }
+
+        if(enemy && !isInvincible) {
+            playerHealth.decrement();
+            print("Player hit. Health: " + playerHealth.getHealth());
+            if(playerHealth.getHealth() <= 0){
+                Die();
+            }
+            else{
+                StartCoroutine(hurtEffect());
+            }
+        }
+    }
+
+    IEnumerator hurtEffect(){
+        spriteRenderer.color = hurtColor;
+        yield return new WaitForSeconds(.5f);
+        spriteRenderer.color = normalColor;
+    }
+
+    public void Die(){
+        gameObject.SetActive(false);
+    }
+}
