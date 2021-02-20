@@ -13,7 +13,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// The maximum hit points for the entity.
         /// </summary>
-        public int maxHP = 1;
+        public int maxHP = 3;
 
         /// <summary>
         /// Indicates if the entity should be considered 'alive'.
@@ -50,6 +50,7 @@ namespace Platformer.Mechanics
         public void Die()
         {
             while (currentHP > 0) Decrement();
+            //gameObject.SetActive(false);
         }
 
         void Awake()
