@@ -19,6 +19,15 @@ public class HealthSystem : MonoBehaviour{
             health = h;
     }
 
+    public void setMaxHealth(int h){
+        maxHealth = h;
+    }
+
+    public void setAll(int h){
+        maxHealth = h;
+        health = maxHealth;
+    }
+
     public void damage(int damage){
         health -= damage;
         healthClamp();

@@ -31,6 +31,7 @@ public class PlayerPlatformerController : PhysicsObject
 
     void Start() {
         playerHealth = GetComponent<HealthSystem>();
+        playerHealth.setAll(maxHealth);
     }
 
     protected override void ComputeVelocity()
