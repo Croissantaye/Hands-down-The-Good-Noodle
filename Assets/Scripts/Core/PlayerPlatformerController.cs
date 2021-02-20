@@ -30,7 +30,7 @@ public class PlayerPlatformerController : PhysicsObject
     }
 
     void Start() {
-        playerHealth = new HealthSystem(maxHealth);
+        playerHealth = GetComponent<HealthSystem>();
     }
 
     protected override void ComputeVelocity()
@@ -74,23 +74,31 @@ public class PlayerPlatformerController : PhysicsObject
     void OnCollisionEnter2D(Collision2D other) {
         BasicEnemy enemy = other.gameObject.GetComponent<BasicEnemy>();
         //all a bit janky. Physics isn't quite right
+        ContactPoint2D hitPoint = other.GetContact(0);
         if(enemy){
             //print("Velocity before " + rb2D.velocity);
-            ContactPoint2D hitPoint = other.GetContact(0);
             // print(hitPoint.normal);
-            Vector2 bounce = new Vector2(hitPoint.normal.x, .5f);
-            rb2D.velocity = bounce.normalized * 8;
+            // Vector2 bounce = new Vector2(hitPoint.normal.x, .7f);
+            // rb2D.velocity = bounce.normalized * 5;
+            rb2D.AddForce(hitPoint.normal * 5, ForceMode2D.Impulse);
             //print("Velocity after " + rb2D.velocity);
-        }
-
-        if(enemy && !isInvincible) {
-            playerHealth.decrement();
-            print("Player hit. Health: " + playerHealth.getHealth());
-            if(playerHealth.getHealth() <= 0){
-                Die();
+            float dotResult = Vector2.Dot(hitPoint.normal, Vector2.up);
+            bool isOnTop;
+            if(dotResult > .5f){
+                isOnTop = true;
             }
             else{
-                StartCoroutine(hurtEffect());
+                isOnTop = false;
+            }
+            if(!isInvincible && !isOnTop) {
+                playerHealth.decrement();
+                print("Player hit. Health: " + playerHealth.getHealth());
+                if(playerHealth.getHealth() <= 0){
+                    Die();
+                }
+                else{
+                    StartCoroutine(hurtEffect());
+                }
             }
         }
     }
