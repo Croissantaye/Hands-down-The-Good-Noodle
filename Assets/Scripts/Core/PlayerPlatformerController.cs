@@ -8,6 +8,7 @@ public class PlayerPlatformerController : PhysicsObject
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
+    public bool canRun = false;
 
     public int maxHealth = 3;
     private int health;
@@ -51,11 +52,11 @@ public class PlayerPlatformerController : PhysicsObject
                 velocity.y = velocity.y * .5f;
             }
         }
-        if(Input.GetButtonDown("Fire3"))
+        if(Input.GetButtonDown("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed * shiftModifier;
         }
-        else if(Input.GetButtonUp("Fire3"))
+        else if(Input.GetButtonUp("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed / shiftModifier;
         }
@@ -81,7 +82,7 @@ public class PlayerPlatformerController : PhysicsObject
             // print(hitPoint.normal);
             // Vector2 bounce = new Vector2(hitPoint.normal.x, .7f);
             // rb2D.velocity = bounce.normalized * 5;
-            rb2D.AddForce(hitPoint.normal * 5, ForceMode2D.Impulse);
+            rb2D.AddForce(hitPoint.normal * 2, ForceMode2D.Impulse);
             //print("Velocity after " + rb2D.velocity);
             float dotResult = Vector2.Dot(hitPoint.normal, Vector2.up);
             bool isOnTop;
