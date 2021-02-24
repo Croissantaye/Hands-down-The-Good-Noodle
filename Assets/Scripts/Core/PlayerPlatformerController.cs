@@ -19,6 +19,8 @@ public class PlayerPlatformerController : PhysicsObject
     private Color hurtColor = Color.yellow;
     private Color normalColor;
 
+    [SerializeField] private Transform pfProjectile;
+
 
     //private Animator animator;
 
