@@ -11,10 +11,18 @@ public class PlayerAimWeapon : MonoBehaviour
         public Vector3 shootPosition; 
     }
     private Transform aimTransform;
-    public Transform gunPoint;
+    [SerializeField] private Transform gunPoint;
 
-    private Vector2 aimDirection;
+    private Vector3 aimDirection;
     private Vector3 mousePosition;
+
+    public Vector3 getAimDirection(){
+        return aimDirection;
+    }
+
+    public Transform getGunPoint(){
+        return gunPoint;
+    }
 
     private void Awake(){
         aimTransform = GetComponent<Transform>();
