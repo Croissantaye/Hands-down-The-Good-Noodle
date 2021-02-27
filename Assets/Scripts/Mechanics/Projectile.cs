@@ -5,6 +5,8 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private Vector3 direction;
+    private float speed = 10f;
+    private Rigidbody2D rb2d;
 
     public void Setup(Vector3 dir){
         this.direction = dir;
@@ -12,15 +14,16 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, 5f);
     }
     // Start is called before the first frame update
-    void Start()
-    {
-        
+    private void Awake() {
+        rb2d = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        Vector3 oldPos = rb2d.position;
+        Vector3 newPos = oldPos + (direction.normalized * speed * Time.deltaTime);
+        rb2d.position = newPos;
     }
 
     protected float GetAngleFromVectorFloat(Vector3 dir){
@@ -30,5 +33,8 @@ public class Projectile : MonoBehaviour
             n += 360;
 
         return n;
+    }
+    public void hit(){
+        Destroy(gameObject);
     }
 }

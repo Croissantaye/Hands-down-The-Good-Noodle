@@ -19,7 +19,7 @@ public class PlayerPlatformerController : PhysicsObject
     private Color hurtColor = Color.yellow;
     private Color normalColor;
 
-    [SerializeField] private Transform pfProjectile;
+    [SerializeField] private Projectile pfProjectile;
 
 
     //private Animator animator;
@@ -35,6 +35,13 @@ public class PlayerPlatformerController : PhysicsObject
     void Start() {
         playerHealth = GetComponent<HealthSystem>();
         playerHealth.setAll(maxHealth);
+    }
+
+    private void Shoot(){
+        PlayerAimWeapon aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
+        Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
+        temp.Setup(aim.getAimDirection());
+        temp = null;
     }
 
     protected override void ComputeVelocity()
@@ -54,6 +61,7 @@ public class PlayerPlatformerController : PhysicsObject
                 velocity.y = velocity.y * .5f;
             }
         }
+
         if(Input.GetButtonDown("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed * shiftModifier;
@@ -61,6 +69,10 @@ public class PlayerPlatformerController : PhysicsObject
         else if(Input.GetButtonUp("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed / shiftModifier;
+        }
+
+        if(Input.GetMouseButtonDown(0)){
+            Shoot();
         }
 
         // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
