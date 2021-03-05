@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6634690734987106265}
   - component: {fileID: 6634690734987106264}
   m_Layer: 0
-  m_Name: Enemy 1
+  m_Name: BasicEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,8 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc9e8c7a1ea1544ba7a143e573f7c80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  health: 3
+  maxHealth: 5
+  health: 5
   speed: 1
   unitsMoved: 2
 --- !u!212 &6634690734987106279

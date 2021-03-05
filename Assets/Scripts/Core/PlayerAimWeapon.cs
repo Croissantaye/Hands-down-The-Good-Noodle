@@ -12,6 +12,7 @@ public class PlayerAimWeapon : MonoBehaviour
     }
     private Transform aimTransform;
     [SerializeField] private Transform gunPoint;
+    [SerializeField] private Transform crosshair;
 
     private Vector3 aimDirection;
     private Vector3 mousePosition;
@@ -31,17 +32,21 @@ public class PlayerAimWeapon : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0f;
         Aiming();
+        UpdateCrosshair();
     }
 
     private void Aiming(){
-        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0f;
-
         aimDirection = (mousePosition - transform.position).normalized;
         float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         aimTransform.eulerAngles =  new Vector3(0, 0, angle);
         Debug.DrawLine(transform.position, mousePosition, Color.cyan);
+    }
+
+    private void UpdateCrosshair(){
+        crosshair.position = mousePosition;
     }
 
     private void Shooting(){

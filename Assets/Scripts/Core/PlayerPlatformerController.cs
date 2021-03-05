@@ -14,12 +14,15 @@ public class PlayerPlatformerController : PhysicsObject
     private int health;
     public bool isInvincible;
     private HealthSystem playerHealth;
+    private GrappleSystem grapple;
 
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
 
     [SerializeField] private Projectile pfProjectile;
+    public Vector2 ropeHook;
+    public float swingForce = 47f;
 
 
     //private Animator animator;
@@ -29,6 +32,7 @@ public class PlayerPlatformerController : PhysicsObject
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         normalColor = spriteRenderer.color;
+        grapple = GetComponent<GrappleSystem>();
         // animator = GetComponent<Animator>();
     }
 
@@ -60,6 +64,10 @@ public class PlayerPlatformerController : PhysicsObject
             {
                 velocity.y = velocity.y * .5f;
             }
+        }
+        if(grapple.GetIsRopeOut()){
+            move.y = 0f;
+            velocity.y = 0f;
         }
 
         if(Input.GetButtonDown("Fire3") && canRun)
