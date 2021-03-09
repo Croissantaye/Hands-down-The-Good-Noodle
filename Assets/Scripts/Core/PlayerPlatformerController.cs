@@ -8,15 +8,21 @@ public class PlayerPlatformerController : PhysicsObject
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
+    public bool canRun = false;
 
     public int maxHealth = 3;
     private int health;
     public bool isInvincible;
     private HealthSystem playerHealth;
+    private GrappleSystem grapple;
 
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
+
+    [SerializeField] private Projectile pfProjectile;
+    public Vector2 ropeHook;
+    public float swingForce = 47f;
 
 
     //private Animator animator;
@@ -26,12 +32,20 @@ public class PlayerPlatformerController : PhysicsObject
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         normalColor = spriteRenderer.color;
+        grapple = GetComponent<GrappleSystem>();
         // animator = GetComponent<Animator>();
     }
 
     void Start() {
         playerHealth = GetComponent<HealthSystem>();
         playerHealth.setAll(maxHealth);
+    }
+
+    private void Shoot(){
+        PlayerAimWeapon aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
+        Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
+        temp.Setup(aim.getAimDirection());
+        temp = null;
     }
 
     protected override void ComputeVelocity()
@@ -51,13 +65,22 @@ public class PlayerPlatformerController : PhysicsObject
                 velocity.y = velocity.y * .5f;
             }
         }
-        if(Input.GetButtonDown("Fire3"))
+        if(grapple.GetIsRopeOut()){
+            move.y = 0f;
+            velocity.y = 0f;
+        }
+
+        if(Input.GetButtonDown("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed * shiftModifier;
         }
-        else if(Input.GetButtonUp("Fire3"))
+        else if(Input.GetButtonUp("Fire3") && canRun)
         {
             maxSpeed = (float)maxSpeed / shiftModifier;
+        }
+
+        if(Input.GetMouseButtonDown(0)){
+            Shoot();
         }
 
         // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
@@ -81,7 +104,7 @@ public class PlayerPlatformerController : PhysicsObject
             // print(hitPoint.normal);
             // Vector2 bounce = new Vector2(hitPoint.normal.x, .7f);
             // rb2D.velocity = bounce.normalized * 5;
-            rb2D.AddForce(hitPoint.normal * 5, ForceMode2D.Impulse);
+            rb2D.AddForce(hitPoint.normal * 2, ForceMode2D.Impulse);
             //print("Velocity after " + rb2D.velocity);
             float dotResult = Vector2.Dot(hitPoint.normal, Vector2.up);
             bool isOnTop;

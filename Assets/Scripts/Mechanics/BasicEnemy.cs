@@ -6,7 +6,13 @@ using UnityEngine;
 public class BasicEnemy : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private BoxCollider2D collision;
+    private PolygonCollider2D collision;
+    private SpriteRenderer spriteRenderer;
+    private Color normalColor;
+    private Color hurtColor;
+    private HealthSystem enemyHealth;
+    public int maxHealth = 3;
+    public int health = 3;
     private Vector2 startPos;
     public float speed;
 
@@ -21,12 +27,20 @@ public class BasicEnemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       rb = GetComponent<Rigidbody2D>();
-       collision = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
+        collision = GetComponent<PolygonCollider2D>();
+        enemyHealth = GetComponent<HealthSystem>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
-       startPos = rb.position;
+        normalColor = spriteRenderer.color;
+        hurtColor = Color.yellow;
 
-       faceLeft = true;
+        enemyHealth.setAll(maxHealth);
+        health = maxHealth;
+
+        startPos = transform.position;
+
+        faceLeft = true;
 
         leftLimit = startPos.x - unitsMoved;
         rightLimit = startPos.x + unitsMoved;
@@ -37,26 +51,26 @@ public class BasicEnemy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-       if (faceLeft)
-       {
-           direction = Vector2.left;
-           if(rb.position.x <= leftLimit)
-           {
-               rb.position = new Vector2(leftLimit, rb.position.y);
-               direction = Vector2.right;
-               faceLeft = false;
-           }
-       }
-       if (!faceLeft)
-       {
-           direction = Vector2.right;
-           if (rb.position.x >= rightLimit)
-           {
-               rb.position = new Vector2(rightLimit, rb.position.y);
-               direction = Vector2.left;
-               faceLeft = true;
-           }
-       }
+        if (faceLeft)
+        {
+            direction = Vector2.left;
+            if(rb.position.x <= leftLimit)
+            {
+                rb.position = new Vector2(leftLimit, rb.position.y);
+                direction = Vector2.right;
+                faceLeft = false;
+            }
+        }
+        if (!faceLeft)
+        {
+            direction = Vector2.right;
+            if (rb.position.x >= rightLimit)
+            {
+                rb.position = new Vector2(rightLimit, rb.position.y);
+                direction = Vector2.left;
+                faceLeft = true;
+            }
+        }
 
        //print(faceLeft);
        move(direction);
@@ -78,14 +92,29 @@ public class BasicEnemy : MonoBehaviour
     private bool shouldDieFromCollision(Collision2D collision)
     {
         PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
+        Projectile bullet = collision.gameObject.GetComponent<Projectile>();
         if(player && collision.GetContact(0).normal.y <= -.5f)
         {
             return true;
+        }
+        else if(bullet){
+            bullet.hit();
+            enemyHealth.decrement();
+            health = enemyHealth.getHealth();
+            StartCoroutine(hurtEffect());
+            if(enemyHealth.getHealth() <= 0)
+                return true;
         }
         return false;
     }
 
     void Die() {
         gameObject.SetActive(false);
+    }
+
+    IEnumerator hurtEffect(){
+        spriteRenderer.color = Color.yellow;
+        yield return new WaitForSeconds(.5f);
+        spriteRenderer.color = normalColor;
     }
 }
