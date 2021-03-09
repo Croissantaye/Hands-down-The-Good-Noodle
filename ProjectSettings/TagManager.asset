@@ -13,8 +13,8 @@ TagManager:
   - UI
   - 
   - 
+  - grapple
   - 
-  - Ground
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: background
+    uniqueID: 951230283
+    locked: 0
+  - name: foreground
+    uniqueID: 1993054889
     locked: 0
