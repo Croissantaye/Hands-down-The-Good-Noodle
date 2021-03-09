@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Platformer.Mechanics;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerPlatformerController : PhysicsObject
 {
@@ -136,6 +135,5 @@ public class PlayerPlatformerController : PhysicsObject
 
     public void Die(){
         gameObject.SetActive(false);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 }
