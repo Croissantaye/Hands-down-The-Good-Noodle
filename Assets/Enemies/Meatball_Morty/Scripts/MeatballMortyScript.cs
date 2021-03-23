@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicEnemy : MonoBehaviour
+public class MeatballMorty : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private PolygonCollider2D collision;
+    private CircleCollider2D collision;
+    private float circumference;
     private SpriteRenderer spriteRenderer;
     private Color normalColor;
     private Color hurtColor;
@@ -28,7 +29,7 @@ public class BasicEnemy : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        collision = GetComponent<PolygonCollider2D>();
+        collision = GetComponent<CircleCollider2D>();
         enemyHealth = GetComponent<HealthSystem>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -46,11 +47,15 @@ public class BasicEnemy : MonoBehaviour
         rightLimit = startPos.x + unitsMoved;
 
         direction = Vector2.zero;
+
+        circumference = 2 * collision.radius * Mathf.PI;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        Vector3 oldPos = rb.position;
+
         if (faceLeft)
         {
             direction = Vector2.left;
@@ -59,6 +64,7 @@ public class BasicEnemy : MonoBehaviour
                 rb.position = new Vector2(leftLimit, rb.position.y);
                 direction = Vector2.right;
                 faceLeft = false;
+                spriteRenderer.flipY = true;
             }
         }
         if (!faceLeft)
@@ -69,11 +75,13 @@ public class BasicEnemy : MonoBehaviour
                 rb.position = new Vector2(rightLimit, rb.position.y);
                 direction = Vector2.left;
                 faceLeft = true;
+                spriteRenderer.flipY = false;
             }
         }
 
        //print(faceLeft);
        move(direction);
+       MortyRoll(oldPos);
     }
 
     void move(Vector2 direction)
@@ -116,5 +124,15 @@ public class BasicEnemy : MonoBehaviour
         spriteRenderer.color = Color.yellow;
         yield return new WaitForSeconds(.5f);
         spriteRenderer.color = normalColor;
+    }
+
+    private void MortyRoll(Vector3 oldPos){
+        Vector3 newPos = rb.position;
+        float x = newPos.x - oldPos.x;
+
+        float ratio = (x / circumference);
+        float degrees = ratio * 360;
+        // Debug.Log(x);
+        transform.Rotate(Vector3.forward, -degrees);
     }
 }
