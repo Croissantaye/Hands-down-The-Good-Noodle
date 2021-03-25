@@ -21,19 +21,21 @@ public class Rocco_Raviolli : MonoBehaviour
     private bool Reset;
     [SerializeField] BoxCollider2D collision;
     [SerializeField] BoxCollider2D trigger;
-    private CircleCollider2D bottom;
+    private CapsuleCollider2D bottom;
     private ContactFilter2D contacts;
     private List<RaycastHit2D> hitResults = new List<RaycastHit2D>(16);
+    private Vector2 startPos;
 
     // Start is called before the first frame update
     void Start()
     {
         //Sets rigidbody
         rb2d = GetComponent<Rigidbody2D>();
-        bottom = GetComponent<CircleCollider2D>();
+        bottom = GetComponent<CapsuleCollider2D>();
 
         //Gets original position to return to after stomp
-        OrigPosition = transform.position;
+        // OrigPosition = transform.position;
+        startPos = rb2d.position;
         //Gets height of object using RayCast
         distanceToFloor = OrigPosition[1];
         //agrorange is now just slightly to the sides of the stomping enemy
@@ -56,6 +58,12 @@ public class Rocco_Raviolli : MonoBehaviour
         //check to see if player is under rocco
         if(CheckIfPlayerUnder()){
             IsFalling = true;
+        }
+        if(rb2d.position.y >= startPos.y && Reset){
+            rb2d.position = startPos;
+            Reset = false;
+            IsFalling = false;
+            IsGrounded = false;
         }
     }
     void FixedUpdate()
@@ -81,12 +89,16 @@ public class Rocco_Raviolli : MonoBehaviour
         // }
         
         if(IsFalling && !IsGrounded && !Reset){
-            Vector2 down = new Vector2(rb2d.position.x, rb2d.position.y - moveSpeed * Time.deltaTime);
-            int hit = Physics2D.Raycast(bottom.transform.position, Vector2.down, contacts, hitResults, .1f);
-            if(hitResults.Count > 0)
-                Debug.DrawLine(rb2d.position, hitResults[0].point, Color.black);
-                Debug.Log("Hit ground");
+            Vector2 down = new Vector2(rb2d.position.x, rb2d.position.y - moveSpeed * Time.fixedDeltaTime);
+            // int hit = Physics2D.Raycast(bottom.transform.position, Vector2.down, contacts, hitResults, .1f);
+            // if(hitResults.Count > 0)
+            //     Debug.DrawLine(rb2d.position, hitResults[0].point, Color.black);
+            //     Debug.Log("Hit ground");
             rb2d.MovePosition(down);
+        }
+        if(Reset){
+            Vector2 move = new Vector2(rb2d.position.x, rb2d.position.y + .5f * moveSpeed * Time.fixedDeltaTime);
+            rb2d.MovePosition(move);
         }
         Vector3 newPos = rb2d.position;
 
@@ -154,5 +166,25 @@ public class Rocco_Raviolli : MonoBehaviour
             rb2d.velocity = new Vector2(0, 1);
         }
         else { rb2d.velocity = new Vector2(0, 0); };
+    }
+    private void OnCollisionEnter2D(Collision2D other) {
+        PlayerPlatformerController player = other.gameObject.GetComponent<PlayerPlatformerController>();
+        if(!player){
+            Debug.Log("ground");
+            IsGrounded = true;
+            StartCoroutine(Squish());
+        }
+        else{
+            IsGrounded = true;
+            StartCoroutine(Squish());
+            player.Die();
+        }
+    }
+
+    IEnumerator Squish(){
+        yield return new WaitForSeconds(.5f);
+        IsFalling = false;
+        IsGrounded = false;
+        Reset = true;
     }
 }

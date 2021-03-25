@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 7510507197926600848}
   - component: {fileID: 7510507197926600853}
   - component: {fileID: 7510507197926600850}
-  - component: {fileID: 7510507197926600851}
   - component: {fileID: 7510507197926600852}
   - component: {fileID: 7510507197926600855}
   m_Layer: 0
-  m_Name: MM_base
+  m_Name: Meatball_Morty
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,22 +100,6 @@ CircleCollider2D:
   m_Offset: {x: 0.006339431, y: 0.030262947}
   serializedVersion: 2
   m_Radius: 0.6282004
---- !u!114 &7510507197926600851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7510507197926600849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5bc9e8c7a1ea1544ba7a143e573f7c80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 3
-  health: 3
-  speed: 2
-  unitsMoved: 2
 --- !u!50 &7510507197926600852
 Rigidbody2D:
   serializedVersion: 4
