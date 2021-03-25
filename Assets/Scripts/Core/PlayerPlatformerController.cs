@@ -25,7 +25,10 @@ public class PlayerPlatformerController : PhysicsObject
     [SerializeField] private Projectile pfProjectile;
     public Vector2 ropeHook;
     public float swingForce = 47f;
-
+    
+    //
+    public delegate void FireWeapon();
+    public static event FireWeapon Shoot;
 
     //private Animator animator;
 
@@ -44,12 +47,17 @@ public class PlayerPlatformerController : PhysicsObject
         playerHealth.setAll(maxHealth);
     }
 
+    //temp block
+    /*
     private void Shoot(){
         PlayerAimWeapon aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
         Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
         temp.Setup(aim.getAimDirection());
         temp = null;
     }
+    */
+
+
 
     public Rigidbody2D GetPlayerRB(){
         return rb;
@@ -98,7 +106,10 @@ public class PlayerPlatformerController : PhysicsObject
         }
 
         if(Input.GetMouseButtonDown(0)){
-            Shoot();
+            if (Shoot != null)
+            {
+                Shoot();
+            }
         }
 
         // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
