@@ -21,12 +21,16 @@ public class Rocco_Raviolli : MonoBehaviour
     private bool Reset;
     [SerializeField] BoxCollider2D collision;
     [SerializeField] BoxCollider2D trigger;
+    private CircleCollider2D bottom;
+    private ContactFilter2D contacts;
+    private List<RaycastHit2D> hitResults = new List<RaycastHit2D>(16);
 
     // Start is called before the first frame update
     void Start()
     {
         //Sets rigidbody
         rb2d = GetComponent<Rigidbody2D>();
+        bottom = GetComponent<CircleCollider2D>();
 
         //Gets original position to return to after stomp
         OrigPosition = transform.position;
@@ -39,6 +43,10 @@ public class Rocco_Raviolli : MonoBehaviour
         IsFalling = false;
         IsGrounded = false;
         Reset = false;
+
+        contacts.useTriggers = false;
+        contacts.SetLayerMask(LayerMask.GetMask("ground"));
+        contacts.useLayerMask = true;
     }
 
     void Update(){
@@ -74,9 +82,10 @@ public class Rocco_Raviolli : MonoBehaviour
         
         if(IsFalling && !IsGrounded && !Reset){
             Vector2 down = new Vector2(rb2d.position.x, rb2d.position.y - moveSpeed * Time.deltaTime);
-            RaycastHit2D hit = Physics2D.Raycast(rb2d.position, Vector2.down, 1.55f);
-            if(hit.collider)
-                Debug.DrawLine(rb2d.position, rb2d.position + Vector2.down * 1.55f, Color.black);
+            int hit = Physics2D.Raycast(bottom.transform.position, Vector2.down, contacts, hitResults, .1f);
+            if(hitResults.Count > 0)
+                Debug.DrawLine(rb2d.position, hitResults[0].point, Color.black);
+                Debug.Log("Hit ground");
             rb2d.MovePosition(down);
         }
         Vector3 newPos = rb2d.position;

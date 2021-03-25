@@ -22,7 +22,7 @@ public class Projectile : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 oldPos = rb2d.position;
-        Vector3 newPos = oldPos + (direction.normalized * speed * Time.deltaTime);
+        Vector3 newPos = oldPos + (direction.normalized * speed * Time.fixedDeltaTime);
         rb2d.position = newPos;
     }
 
