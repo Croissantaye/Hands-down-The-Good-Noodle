@@ -17,6 +17,7 @@ public class PlayerPlatformerController : PhysicsObject
     private HealthSystem playerHealth;
     private GrappleSystem grapple;
 
+    private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
@@ -35,6 +36,7 @@ public class PlayerPlatformerController : PhysicsObject
         normalColor = spriteRenderer.color;
         grapple = GetComponent<GrappleSystem>();
         // animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Start() {
@@ -47,6 +49,21 @@ public class PlayerPlatformerController : PhysicsObject
         Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
         temp.Setup(aim.getAimDirection());
         temp = null;
+    }
+
+    public Rigidbody2D GetPlayerRB(){
+        return rb;
+    }
+    public Vector3 GetRBPosition(){
+        return rb.position;
+    }
+
+    public void SetCurrenthealth(int h){
+        playerHealth.setHealth(h);
+    }
+
+    public int GetCurrentHealth(){
+        return playerHealth.getHealth();
     }
 
     protected override void ComputeVelocity()
@@ -136,6 +153,6 @@ public class PlayerPlatformerController : PhysicsObject
 
     public void Die(){
         gameObject.SetActive(false);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 }
