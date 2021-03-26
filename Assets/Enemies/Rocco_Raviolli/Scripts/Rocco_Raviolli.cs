@@ -25,6 +25,7 @@ public class Rocco_Raviolli : MonoBehaviour
     private ContactFilter2D contacts;
     private List<RaycastHit2D> hitResults = new List<RaycastHit2D>(16);
     private Vector2 startPos;
+    private Animator animator;
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +33,8 @@ public class Rocco_Raviolli : MonoBehaviour
         //Sets rigidbody
         rb2d = GetComponent<Rigidbody2D>();
         bottom = GetComponent<CapsuleCollider2D>();
+
+        animator = GetComponent<Animator>();
 
         //Gets original position to return to after stomp
         // OrigPosition = transform.position;
@@ -42,9 +45,13 @@ public class Rocco_Raviolli : MonoBehaviour
         agroRange = distanceToFloor + 1;
 
         InRange = false;
+        animator.SetBool("InRange", InRange);
         IsFalling = false;
+        animator.SetBool("IsFalling", IsFalling);
         IsGrounded = false;
+        animator.SetBool("IsGrounded", IsGrounded);
         Reset = false;
+        animator.SetBool("Reset", Reset);
 
         contacts.useTriggers = false;
         contacts.SetLayerMask(LayerMask.GetMask("ground"));
@@ -56,14 +63,18 @@ public class Rocco_Raviolli : MonoBehaviour
         //     Debug.Log(playerPos.position);
 
         //check to see if player is under rocco
-        if(CheckIfPlayerUnder()){
+        if(CheckIfPlayerUnder() && !Reset){
             IsFalling = true;
+            animator.SetBool("IsFalling", IsFalling);
         }
         if(rb2d.position.y >= startPos.y && Reset){
             rb2d.position = startPos;
             Reset = false;
+            animator.SetBool("Reset", Reset);
             IsFalling = false;
+            animator.SetBool("IsFalling", IsFalling);
             IsGrounded = false;
+            animator.SetBool("IsGrounded", IsGrounded);
         }
     }
     void FixedUpdate()
@@ -113,6 +124,7 @@ public class Rocco_Raviolli : MonoBehaviour
             if(playerPos)
                 Debug.Log("Got player transform");
             InRange = true;
+            animator.SetBool("InRange", InRange);
         }
     }
     private void OnTriggerExit2D(Collider2D other) {
@@ -121,6 +133,7 @@ public class Rocco_Raviolli : MonoBehaviour
             playerPos = null;
             Debug.Log("Player exit trigger");
             InRange = false;
+            animator.SetBool("InRange", InRange);
         }
     }
 
@@ -172,10 +185,12 @@ public class Rocco_Raviolli : MonoBehaviour
         if(!player){
             Debug.Log("ground");
             IsGrounded = true;
+            animator.SetBool("IsGrounded", IsGrounded);
             StartCoroutine(Squish());
         }
         else{
             IsGrounded = true;
+            animator.SetBool("IsGrounded", true);
             StartCoroutine(Squish());
             player.Die();
         }
@@ -184,7 +199,14 @@ public class Rocco_Raviolli : MonoBehaviour
     IEnumerator Squish(){
         yield return new WaitForSeconds(.5f);
         IsFalling = false;
+        animator.SetBool("IsFalling", IsFalling);
         IsGrounded = false;
+        animator.SetBool("IsGrounded", IsGrounded);
         Reset = true;
+        animator.SetBool("Reset", Reset);
     }
+
+    // private void SetAnimatorBool(string name, bool value){
+    //     animator.SetBool(name, value);
+    // }
 }

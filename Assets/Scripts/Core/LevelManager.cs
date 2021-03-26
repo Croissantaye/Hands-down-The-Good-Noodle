@@ -10,11 +10,11 @@ public class LevelManager : MonoBehaviour
     private Checkpoint lastCheckpoint;
     
     private void OnEnable() {
-        KillZone.Killed += Respawn;
+        PlayerPlatformerController.Killed += Respawn;
     }
 
     private void OnDisable() {
-        KillZone.Killed -= Respawn;
+        PlayerPlatformerController.Killed -= Respawn;
     }
         void Start()
     {

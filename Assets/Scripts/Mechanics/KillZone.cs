@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class KillZone : MonoBehaviour
 {
-    public delegate void OnKillPlayer();
-    public static event OnKillPlayer Killed;
+    // public delegate void OnKillPlayer();
+    // public static event OnKillPlayer Killed;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,10 +23,7 @@ public class KillZone : MonoBehaviour
         // Debug.Log("enter killzoe");
         if(Player){
             Debug.Log("kill player");
-            // Player.Die();
-            if(Killed != null){
-                Killed();
-            }
+            Player.Die();
         }
     }
 }

@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerPlatformerController : PhysicsObject
 {
+    public delegate void OnKillPlayer();
+    public static event OnKillPlayer Killed;
+
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
@@ -72,6 +75,12 @@ public class PlayerPlatformerController : PhysicsObject
 
     public int GetCurrentHealth(){
         return playerHealth.getHealth();
+    }
+
+    public void Hurt(){
+        playerHealth.decrement();
+        if(gameObject.activeInHierarchy)
+            StartCoroutine(hurtEffect());
     }
 
     protected override void ComputeVelocity()
@@ -163,7 +172,10 @@ public class PlayerPlatformerController : PhysicsObject
     }
 
     public void Die(){
-        gameObject.SetActive(false);
+        // gameObject.SetActive(false);
+        if(Killed != null){
+            Killed();
+        }
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 }
