@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerPlatformerController : PhysicsObject
 {
+    public delegate void OnKillPlayer();
+    public static event OnKillPlayer Killed;
+
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
@@ -25,7 +28,10 @@ public class PlayerPlatformerController : PhysicsObject
     [SerializeField] private Projectile pfProjectile;
     public Vector2 ropeHook;
     public float swingForce = 47f;
-
+    
+    //
+    public delegate void FireWeapon();
+    public static event FireWeapon Shoot;
 
     //private Animator animator;
 
@@ -44,12 +50,17 @@ public class PlayerPlatformerController : PhysicsObject
         playerHealth.setAll(maxHealth);
     }
 
+    //temp block
+    /*
     private void Shoot(){
         PlayerAimWeapon aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
         Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
         temp.Setup(aim.getAimDirection());
         temp = null;
     }
+    */
+
+
 
     public Rigidbody2D GetPlayerRB(){
         return rb;
@@ -64,6 +75,12 @@ public class PlayerPlatformerController : PhysicsObject
 
     public int GetCurrentHealth(){
         return playerHealth.getHealth();
+    }
+
+    public void Hurt(){
+        playerHealth.decrement();
+        if(gameObject.activeInHierarchy)
+            StartCoroutine(hurtEffect());
     }
 
     protected override void ComputeVelocity()
@@ -98,7 +115,10 @@ public class PlayerPlatformerController : PhysicsObject
         }
 
         if(Input.GetMouseButtonDown(0)){
-            Shoot();
+            if (Shoot != null)
+            {
+                Shoot();
+            }
         }
 
         // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
@@ -152,7 +172,10 @@ public class PlayerPlatformerController : PhysicsObject
     }
 
     public void Die(){
-        gameObject.SetActive(false);
+        // gameObject.SetActive(false);
+        if(Killed != null){
+            Killed();
+        }
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 }
