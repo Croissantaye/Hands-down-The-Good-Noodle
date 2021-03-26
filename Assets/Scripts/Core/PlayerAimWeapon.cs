@@ -21,6 +21,9 @@ public class PlayerAimWeapon : MonoBehaviour
         return aimDirection;
     }
 
+    public float getAimAngle(){
+        return aimTransform.eulerAngles.z;
+    }
     public Transform getGunPoint(){
         return gunPoint;
     }

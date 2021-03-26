@@ -5,10 +5,11 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private Vector3 direction;
-    [SerializeField] private float speed = 10f;
+    private float speed = 10f;
     private Rigidbody2D rb2d;
 
-    public void Setup(Vector3 dir){
+    public void Setup(Vector3 dir, float s){
+        speed = s;
         this.direction = dir;
         transform.eulerAngles = new Vector3(0, 0, GetAngleFromVectorFloat(direction));
         Destroy(gameObject, 5f);
