@@ -8,12 +8,12 @@ public class Weapon : MonoBehaviour
     protected float speed;
     protected int numProjectiles;
 
-    protected void fire()
+    protected virtual void fire()
     {
         Debug.Log("fire");
     }
 
-    protected void reload() 
+    protected virtual void reload() 
     {
         Debug.Log("reload");
     }

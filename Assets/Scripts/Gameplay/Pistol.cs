@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Shotgun : Weapon
+public class Pistol : Weapon
 {
-    [SerializeField] private int SpreadAngle = 15;
     private PlayerAimWeapon aim;
     [SerializeField] private Projectile bullet;
-    [SerializeField] private float shotgunSpeed;
+    [SerializeField] private float pistolSpeed;
     [SerializeField] private int BulletNum;
 
     // Start is called before the first frame update
     void Start()
     {
         aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
-        ammo = 6;
-        speed = shotgunSpeed;
+        ammo = 12;
+        speed = pistolSpeed;
         numProjectiles = BulletNum;
     }
 
@@ -41,18 +40,13 @@ public class Shotgun : Weapon
     ///Inherited from Weapon/Parent
     protected override void fire()
     {
-        Debug.Log("fire shotgun");
-        int numOfSections = numProjectiles - 1;
-        float angleOffset = aim.getAimAngle() + (SpreadAngle / 2);
+        Debug.Log("fire pistol");
 
         for(int i = 0; i < numProjectiles; i++)
         {
-            // determine the angle offset for the bullet
-            float bulletAngle = angleOffset - ((SpreadAngle / numOfSections) * i);
-            bulletAngle = Mathf.Deg2Rad * bulletAngle;
             // setup each projectile to go on a different angle
             Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
-            Vector3 direction = new Vector3(Mathf.Cos(bulletAngle), Mathf.Sin(bulletAngle), 0f);
+            Vector3 direction = aim.getAimDirection();
             temp.Setup(direction, speed);
             temp = null;
         }
@@ -64,3 +58,4 @@ public class Shotgun : Weapon
     }
 
 }
+
