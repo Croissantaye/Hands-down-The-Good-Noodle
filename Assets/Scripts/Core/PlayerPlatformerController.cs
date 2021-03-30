@@ -166,7 +166,7 @@ public class PlayerPlatformerController : PhysicsObject
             }
             if(!isInvincible && !isOnTop) {
                 playerHealth.decrement();
-                print("Player hit. Health: " + playerHealth.getHealth());
+                // print("Player hit. Health: " + playerHealth.getHealth());
                 if(playerHealth.getHealth() <= 0){
                     Die();
                 }

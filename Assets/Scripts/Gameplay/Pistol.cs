@@ -42,14 +42,10 @@ public class Pistol : Weapon
     {
         Debug.Log("fire pistol");
 
-        for(int i = 0; i < numProjectiles; i++)
-        {
-            // setup each projectile to go on a different angle
-            Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
-            Vector3 direction = aim.getAimDirection();
-            temp.Setup(direction, speed);
-            temp = null;
-        }
+        Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
+        Vector3 direction = aim.getAimDirection();
+        temp.Setup(direction, speed);
+        temp = null;
     }
 
     protected override void reload()
