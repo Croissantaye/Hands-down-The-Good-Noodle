@@ -9,8 +9,6 @@ public class Enemy_BehaviorScrew : MonoBehaviour
     [SerializeField]
     float jumpSpeed;
     [SerializeField]
-    float hangTime;
-    [SerializeField]
     float patrolDist;
     [SerializeField]
     float height;
