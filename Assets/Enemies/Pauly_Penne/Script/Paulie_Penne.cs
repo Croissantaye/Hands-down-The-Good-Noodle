@@ -40,7 +40,7 @@ public class Paulie_Penne : BasicEnemy
 
         PlayerSeen = false;
         contactFilter.useTriggers = false;
-        contactFilter.SetLayerMask(LayerMask.GetMask("player"));
+        contactFilter.SetLayerMask(LayerMask.GetMask("default"));
         // Debug.Log(LayerMask.GetMask("player"));
         contactFilter.useLayerMask = true;
     }
@@ -60,6 +60,7 @@ public class Paulie_Penne : BasicEnemy
         // Debug.Log(GetDirection());
         List<RaycastHit2D> results = new List<RaycastHit2D>(16);
         int hitNum = Physics2D.Raycast(transform.position, GetDirection(), contactFilter, results, RangeOfSight);
+        Debug.Log(hitNum);
         if(hitNum > 0){
             Debug.Log("player seen");
             Debug.DrawLine(transform.position, results[0].point, Color.blue);
@@ -86,12 +87,12 @@ public class Paulie_Penne : BasicEnemy
     // }
 
     private void shoot(){
+        Debug.Log("paulie shoot");
         if(canShoot && PlayerSeen){
-            Debug.Log("paulie shoot");
-            Projectile temp = Instantiate(bullet, gunpoint.position, Quaternion.identity);
-            Vector3 direction = GetDirection();
-            temp.Setup(direction, bulletSpeed);
-            temp = null;
+            // Projectile temp = Instantiate(bullet, gunpoint.position, Quaternion.identity);
+            // Vector3 direction = GetDirection();
+            // temp.Setup(direction, bulletSpeed);
+            // temp = null;
             StartCoroutine(CoolDown());
         }
     }

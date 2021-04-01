@@ -39,7 +39,9 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
     protected virtual void OnCollisionEnter2D(Collision2D other) {
-        hit();
+        PlayerPlatformerController player = other.gameObject.GetComponent<PlayerPlatformerController>();
+        if(!player)
+            hit();
     }
 
     public virtual bool IsEnemyProjectile(){
