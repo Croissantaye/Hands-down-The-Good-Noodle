@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    private Vector3 direction;
-    private float speed = 10f;
-    private Rigidbody2D rb2d;
+    protected Vector3 direction;
+    protected float speed;
+    protected Rigidbody2D rb2d;
 
     public void Setup(Vector3 dir, float s){
         speed = s;
@@ -15,12 +15,12 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, 5f);
     }
     // Start is called before the first frame update
-    private void Awake() {
+    protected void Awake() {
         rb2d = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    protected void FixedUpdate()
     {
         Vector3 oldPos = rb2d.position;
         Vector3 newPos = oldPos + (direction.normalized * speed * Time.fixedDeltaTime);
@@ -37,5 +37,16 @@ public class Projectile : MonoBehaviour
     }
     public void hit(){
         Destroy(gameObject);
+    }
+
+    //little bit janky, don't really like relying on a string to check
+    protected virtual void OnTriggerEnter2D(Collider2D other) {
+        if(other.gameObject.name == "Tilemap_LevelMap"){
+            hit();
+        }
+    }
+
+    public virtual bool IsEnemyProjectile(){
+        return false;
     }
 }

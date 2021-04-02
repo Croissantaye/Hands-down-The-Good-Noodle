@@ -39,9 +39,9 @@ public class Shotgun : Weapon
 
 
     ///Inherited from Weapon/Parent
-    private void fire()
+    protected override void fire()
     {
-        Debug.Log("fire shotgun");
+        // Debug.Log("fire shotgun");
         int numOfSections = numProjectiles - 1;
         float angleOffset = aim.getAimAngle() + (SpreadAngle / 2);
 
@@ -58,7 +58,7 @@ public class Shotgun : Weapon
         }
     }
 
-    private void reload()
+    protected override void reload()
     {
         Debug.Log("reload");
     }

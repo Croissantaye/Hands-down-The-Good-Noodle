@@ -25,11 +25,11 @@ public class PlayerPlatformerController : PhysicsObject
     private Color hurtColor = Color.yellow;
     private Color normalColor;
 
-    [SerializeField] private Projectile pfProjectile;
     public Vector2 ropeHook;
     public float swingForce = 47f;
     
-    //
+    private Pistol pistol;
+    private Shotgun shotgun;
     public delegate void FireWeapon();
     public static event FireWeapon Shoot;
 
@@ -43,24 +43,29 @@ public class PlayerPlatformerController : PhysicsObject
         grapple = GetComponent<GrappleSystem>();
         // animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        pistol = GetComponent<Pistol>();
+        shotgun = GetComponent<Shotgun>();
     }
 
     void Start() {
         playerHealth = GetComponent<HealthSystem>();
         playerHealth.setAll(maxHealth);
+        pistol.enabled = true;
+        shotgun.enabled = false;
     }
 
-    //temp block
-    /*
-    private void Shoot(){
-        PlayerAimWeapon aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
-        Projectile temp = Instantiate(pfProjectile, aim.getGunPoint().position, Quaternion.identity);
-        temp.Setup(aim.getAimDirection());
-        temp = null;
+    private void ChangeWeapon(Weapon weapon){
+        if(weapon == pistol){
+            pistol.enabled = true;
+            shotgun.enabled = false;
+            // Debug.Log("Switch to pistol");
+        }
+        else if(weapon = shotgun){
+            shotgun.enabled = true;
+            pistol.enabled = false;
+            // Debug.Log("Switch to shotgun");
+        }
     }
-    */
-
-
 
     public Rigidbody2D GetPlayerRB(){
         return rb;
@@ -121,6 +126,13 @@ public class PlayerPlatformerController : PhysicsObject
             }
         }
 
+        if(Input.GetButtonDown("Num1")){
+            ChangeWeapon(pistol);
+        }
+        else if(Input.GetButtonDown("Num2")){
+            ChangeWeapon(shotgun);
+        }
+
         // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
         // if(flipSprite)
         // {
@@ -154,7 +166,7 @@ public class PlayerPlatformerController : PhysicsObject
             }
             if(!isInvincible && !isOnTop) {
                 playerHealth.decrement();
-                print("Player hit. Health: " + playerHealth.getHealth());
+                // print("Player hit. Health: " + playerHealth.getHealth());
                 if(playerHealth.getHealth() <= 0){
                     Die();
                 }

@@ -20,7 +20,7 @@ public class LevelManager : MonoBehaviour
     {
         player = FindObjectOfType<PlayerPlatformerController>();
         if(player){
-            Debug.Log("FOund player");
+            // Debug.Log("FOund player");
             playerStart = player.GetRBPosition();
         }
     }

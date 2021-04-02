@@ -5,30 +5,30 @@ using UnityEngine;
 
 public class BasicEnemy : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private PolygonCollider2D collision;
-    private SpriteRenderer spriteRenderer;
-    private Color normalColor;
-    private Color hurtColor;
-    private HealthSystem enemyHealth;
-    public int maxHealth = 3;
-    public int health = 3;
-    private Vector2 startPos;
-    public float speed;
+    protected Rigidbody2D rb;
+    // private PolygonCollider2D collision;
+    protected SpriteRenderer spriteRenderer;
+    protected Color normalColor;
+    protected Color hurtColor;
+    protected HealthSystem enemyHealth;
+    protected int maxHealth;
+    protected int health;
+    // private Vector2 startPos;
+    protected float speed;
 
-    public int unitsMoved;
+    // public int unitsMoved;
 
-    private bool faceLeft;
+    // private bool faceLeft;
 
-    private float leftLimit;
-    private float rightLimit;
+    // private float leftLimit;
+    // private float rightLimit;
 
-    private Vector2 direction;
+    // private Vector2 direction;
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        collision = GetComponent<PolygonCollider2D>();
+        // collision = GetComponent<PolygonCollider2D>();
         enemyHealth = GetComponent<HealthSystem>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -38,50 +38,50 @@ public class BasicEnemy : MonoBehaviour
         enemyHealth.setAll(maxHealth);
         health = maxHealth;
 
-        startPos = transform.position;
+        // startPos = transform.position;
 
-        faceLeft = true;
+        // faceLeft = true;
 
-        leftLimit = startPos.x - unitsMoved;
-        rightLimit = startPos.x + unitsMoved;
+        // leftLimit = startPos.x - unitsMoved;
+        // rightLimit = startPos.x + unitsMoved;
 
-        direction = Vector2.zero;
+        // direction = Vector2.zero;
     }
 
     // Update is called once per frame
-    void FixedUpdate()
-    {
-        if (faceLeft)
-        {
-            direction = Vector2.left;
-            if(rb.position.x <= leftLimit)
-            {
-                rb.position = new Vector2(leftLimit, rb.position.y);
-                direction = Vector2.right;
-                faceLeft = false;
-            }
-        }
-        if (!faceLeft)
-        {
-            direction = Vector2.right;
-            if (rb.position.x >= rightLimit)
-            {
-                rb.position = new Vector2(rightLimit, rb.position.y);
-                direction = Vector2.left;
-                faceLeft = true;
-            }
-        }
+    // void FixedUpdate()
+    // {
+    //     if (faceLeft)
+    //     {
+    //         direction = Vector2.left;
+    //         if(rb.position.x <= leftLimit)
+    //         {
+    //             rb.position = new Vector2(leftLimit, rb.position.y);
+    //             direction = Vector2.right;
+    //             faceLeft = false;
+    //         }
+    //     }
+    //     if (!faceLeft)
+    //     {
+    //         direction = Vector2.right;
+    //         if (rb.position.x >= rightLimit)
+    //         {
+    //             rb.position = new Vector2(rightLimit, rb.position.y);
+    //             direction = Vector2.left;
+    //             faceLeft = true;
+    //         }
+    //     }
 
-       //print(faceLeft);
-       move(direction);
-    }
+    //    //print(faceLeft);
+    //    move(direction);
+    // }
 
-    void move(Vector2 direction)
+    protected void move(Vector2 direction)
     {
        rb.position = rb.position + (direction * speed * Time.deltaTime);
     }
 
-    void OnCollisionEnter2D(Collision2D collider) 
+    protected void OnTriggerEnter2D(Collider2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -89,26 +89,28 @@ public class BasicEnemy : MonoBehaviour
         }
     }
 
-    private bool shouldDieFromCollision(Collision2D collision)
+    private bool shouldDieFromCollision(Collider2D collision)
     {
-        PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
+        // PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
-        if(player && collision.GetContact(0).normal.y <= -.5f)
-        {
-            return true;
-        }
-        else if(bullet){
+        // if(player && collision.GetContact(0).normal.y <= -.5f)
+        // {
+        //     return true;
+        // }
+        if(bullet && !bullet.IsEnemyProjectile()){
             bullet.hit();
             enemyHealth.decrement();
             health = enemyHealth.getHealth();
-            StartCoroutine(hurtEffect());
+            if(this.gameObject.activeInHierarchy)
+                StartCoroutine(hurtEffect());
             if(enemyHealth.getHealth() <= 0)
                 return true;
         }
         return false;
     }
 
-    void Die() {
+    private void Die() {
+        Debug.Log("enemy died");
         gameObject.SetActive(false);
     }
 
