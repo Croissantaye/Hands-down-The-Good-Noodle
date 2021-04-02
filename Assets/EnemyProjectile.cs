@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class EnemyProjectile : Projectile
 {
-    protected override void OnCollisionEnter2D(Collision2D other)
+    protected override void OnTriggerEnter2D(Collider2D other)
     {
         PlayerPlatformerController player = other.gameObject.GetComponent<PlayerPlatformerController>();
         if(player){
             player.Hurt();
             hit();
         }
-        else{
+        else if(other.gameObject.name == "Tilemap_LevelMap"){
             hit();
         }
     }

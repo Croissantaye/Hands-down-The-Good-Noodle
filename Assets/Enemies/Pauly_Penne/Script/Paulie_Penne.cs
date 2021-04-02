@@ -10,12 +10,14 @@ public class Paulie_Penne : BasicEnemy
     [SerializeField] [Range (.1f, 5f)] float coolDownTime = .5f;
     private bool canShoot;
     private Transform gunpoint;
-    [SerializeField] EnemyProjectile bullet;
-    private Vector3 gunPointLeft;
-    private Vector3 gunpointRight;
+    [SerializeField] private EnemyProjectile bullet;
+    // private Vector3 gunPointLeft;
+    // private Vector3 gunpointRight;
+    [SerializeField] private bool FaceLeft;
+    private FaceDireciton faceDireciton;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private int PaulieMaxHealth = 3;
-    [SerializeField] [Range (0f, 45f)] private float ConeOfVisionAngle = 15f;
+    // [SerializeField] [Range (0f, 45f)] private float ConeOfVisionAngle = 15f;
     [SerializeField] [Range (.1f, 100f)] private float RangeOfSight = 25f;
     private ContactFilter2D contactFilter;
     private bool PlayerSeen;
@@ -26,28 +28,30 @@ public class Paulie_Penne : BasicEnemy
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         gunpoint = GetComponentInChildren<Transform>();
-        // Debug.Log(gunpoint.position);
 
         normalColor = spriteRenderer.color;
         hurtColor = Color.yellow;
 
+        animator.SetBool("is_shooting", false);
+
         enemyHealth.setAll(PaulieMaxHealth);
-        // health = maxHealth;
 
         canShoot = true;
-        gunPointLeft = gunpoint.position - transform.position;
-        gunpointRight = transform.position + new Vector3(-gunPointLeft.x, gunPointLeft.y, 0f);
+        if(FaceLeft){
+            faceDireciton = FaceDireciton.Left;
+        }
+        else{
+            faceDireciton = FaceDireciton.Right;
+            FlipDirection();
+        }
 
         PlayerSeen = false;
         contactFilter.useTriggers = false;
-        contactFilter.SetLayerMask(LayerMask.GetMask("default"));
-        // Debug.Log(LayerMask.GetMask("player"));
+        contactFilter.SetLayerMask(LayerMask.GetMask("player"));
         contactFilter.useLayerMask = true;
     }
 
     void FixedUpdate(){
-        // Debug.Log("Gunpoint" + gunpoint.position);
-        // Debug.Log("Transform" + transform.position);
         if(canShoot){
             LineOfSight();
         }
@@ -59,23 +63,27 @@ public class Paulie_Penne : BasicEnemy
     private void LineOfSight(){
         // Debug.Log(GetDirection());
         List<RaycastHit2D> results = new List<RaycastHit2D>(16);
+        // Debug.DrawRay(transform.position, GetDirection(), Color.blue, 1f);
         int hitNum = Physics2D.Raycast(transform.position, GetDirection(), contactFilter, results, RangeOfSight);
         Debug.Log(hitNum);
         if(hitNum > 0){
             Debug.Log("player seen");
-            Debug.DrawLine(transform.position, results[0].point, Color.blue);
+            // Debug.DrawLine(transform.position, results[0].point, Color.blue, coolDownTime);
             PlayerSeen = true;
+            results.Clear();
         }
     }    
 
     private void FlipDirection(){
         if(!spriteRenderer.flipX){
             spriteRenderer.flipX = true;
-            gunpoint.position = gunpointRight;
+            faceDireciton = FaceDireciton.Right;
+            // gunpoint.position = gunpointRight;
         }
         else if(spriteRenderer.flipX){
             spriteRenderer.flipX = false;
-            gunpoint.position = gunPointLeft;
+            faceDireciton = FaceDireciton.Left;
+            // gunpoint.position = gunPointLeft;
         }
     }
 
@@ -87,24 +95,23 @@ public class Paulie_Penne : BasicEnemy
     // }
 
     private void shoot(){
-        Debug.Log("paulie shoot");
         if(canShoot && PlayerSeen){
-            // Projectile temp = Instantiate(bullet, gunpoint.position, Quaternion.identity);
-            // Vector3 direction = GetDirection();
-            // temp.Setup(direction, bulletSpeed);
-            // temp = null;
+            animator.SetBool("is_shooting", true);
+            Debug.Log("paulie shoot");
+            Projectile temp = Instantiate(bullet, gunpoint.position, Quaternion.identity);
+            Vector3 direction = GetDirection();
+            temp.Setup(direction, bulletSpeed);
+            temp = null;
             StartCoroutine(CoolDown());
         }
     }
 
     private Vector3 GetDirection(){
-        Vector3 direction = Vector3.zero;
-        float transform_x = gameObject.GetComponent<Transform>().position.x;
-        float gunPoint_x = gunpoint.position.x;
-        if(transform_x > gunPoint_x){
+        Vector3 direction;
+        if(faceDireciton == FaceDireciton.Left){
             direction = Vector3.left;
         }
-        else if(transform_x < gunPoint_x){
+        else{
             direction = Vector3.right;
         }
         return direction;
@@ -114,7 +121,17 @@ public class Paulie_Penne : BasicEnemy
         // wait between each shot
         canShoot = false;
         PlayerSeen = false;
-        yield return new WaitForSeconds(coolDownTime);
+        // float transition = animator.GetAnimatorTransitionInfo(animator.GetLayerIndex("pauly_shoot")).duration;
+        // Debug.Log(transition);
+        yield return new WaitForSeconds(.25f);
+        animator.SetBool("is_shooting", false);
+        yield return new WaitForSeconds(coolDownTime - .25f);
         canShoot = true;
+    }
+
+    enum FaceDireciton
+    {
+        Left,
+        Right
     }
 }

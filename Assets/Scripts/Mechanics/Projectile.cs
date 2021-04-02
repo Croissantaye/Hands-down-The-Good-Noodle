@@ -38,10 +38,12 @@ public class Projectile : MonoBehaviour
     public void hit(){
         Destroy(gameObject);
     }
-    protected virtual void OnCollisionEnter2D(Collision2D other) {
-        PlayerPlatformerController player = other.gameObject.GetComponent<PlayerPlatformerController>();
-        if(!player)
+
+    //little bit janky, don't really like relying on a string to check
+    protected virtual void OnTriggerEnter2D(Collider2D other) {
+        if(other.gameObject.name == "Tilemap_LevelMap"){
             hit();
+        }
     }
 
     public virtual bool IsEnemyProjectile(){

@@ -81,7 +81,7 @@ public class BasicEnemy : MonoBehaviour
        rb.position = rb.position + (direction * speed * Time.deltaTime);
     }
 
-    protected void OnCollisionEnter2D(Collision2D collider) 
+    protected void OnTriggerEnter2D(Collider2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -89,7 +89,7 @@ public class BasicEnemy : MonoBehaviour
         }
     }
 
-    private bool shouldDieFromCollision(Collision2D collision)
+    private bool shouldDieFromCollision(Collider2D collision)
     {
         // PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
@@ -101,7 +101,8 @@ public class BasicEnemy : MonoBehaviour
             bullet.hit();
             enemyHealth.decrement();
             health = enemyHealth.getHealth();
-            StartCoroutine(hurtEffect());
+            if(this.gameObject.activeInHierarchy)
+                StartCoroutine(hurtEffect());
             if(enemyHealth.getHealth() <= 0)
                 return true;
         }

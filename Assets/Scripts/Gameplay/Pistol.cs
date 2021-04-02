@@ -40,7 +40,7 @@ public class Pistol : Weapon
     ///Inherited from Weapon/Parent
     protected override void fire()
     {
-        Debug.Log("fire pistol");
+        // Debug.Log("fire pistol");
 
         Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
         Vector3 direction = aim.getAimDirection();
