@@ -89,7 +89,7 @@ public class MeatballMorty : MonoBehaviour
        rb.position = rb.position + (direction * speed * Time.deltaTime);
     }
 
-    void OnCollisionEnter2D(Collision2D collider) 
+    protected void OnTriggerEnter2D(Collider2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -97,15 +97,11 @@ public class MeatballMorty : MonoBehaviour
         }
     }
 
-    private bool shouldDieFromCollision(Collision2D collision)
+    private bool shouldDieFromCollision(Collider2D collision)
     {
         PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
-        if(player && collision.GetContact(0).normal.y <= -.5f)
-        {
-            return true;
-        }
-        else if(bullet){
+        if(bullet){
             bullet.hit();
             enemyHealth.decrement();
             health = enemyHealth.getHealth();
