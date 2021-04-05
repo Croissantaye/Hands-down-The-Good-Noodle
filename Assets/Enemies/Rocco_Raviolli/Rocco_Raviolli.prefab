@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99c37e483f5e2754ab006e44767d5ffd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 10
   underRange: 1.5
   collision: {fileID: 8292651723515894}
   trigger: {fileID: 8292651723515883}

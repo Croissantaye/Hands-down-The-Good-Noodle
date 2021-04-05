@@ -9,7 +9,7 @@ public class Rocco_Raviolli : MonoBehaviour
     private float agroRange;
     private float distanceToFloor;
 
-    [SerializeField] float moveSpeed;
+    [SerializeField] float moveSpeed = 10f;
     [SerializeField] float underRange;
 
     private Vector2 OrigPosition;
