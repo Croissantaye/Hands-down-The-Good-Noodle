@@ -84,10 +84,10 @@ public class MeatballMorty : BasicEnemy
        MortyRoll(oldPos);
     }
 
-    // protected override void move(Vector2 direction)
-    // {
-    //    rb.position = rb.position + (direction * speed * Time.deltaTime);
-    // }
+     protected override void move(Vector2 direction)
+     {
+        rb.position = rb.position + (direction * speed * Time.deltaTime);
+     }
 
     protected override void OnTriggerEnter2D(Collider2D collider) 
     {

@@ -79,6 +79,7 @@ public class BasicEnemy : MonoBehaviour
     protected virtual void move(Vector2 direction)
     {
        rb.position = rb.position + (direction * speed * Time.deltaTime);
+       // Debug.Log(direction);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collider) 
