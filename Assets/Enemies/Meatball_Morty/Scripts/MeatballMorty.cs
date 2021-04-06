@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeatballMorty : MonoBehaviour
+public class MeatballMorty : BasicEnemy
 {
     private Rigidbody2D rb;
     private CircleCollider2D collision;
@@ -26,7 +26,7 @@ public class MeatballMorty : MonoBehaviour
 
     private Vector2 direction;
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         collision = GetComponent<CircleCollider2D>();
@@ -84,12 +84,12 @@ public class MeatballMorty : MonoBehaviour
        MortyRoll(oldPos);
     }
 
-    void move(Vector2 direction)
-    {
-       rb.position = rb.position + (direction * speed * Time.deltaTime);
-    }
+    // protected override void move(Vector2 direction)
+    // {
+    //    rb.position = rb.position + (direction * speed * Time.deltaTime);
+    // }
 
-    protected void OnTriggerEnter2D(Collider2D collider) 
+    protected override void OnTriggerEnter2D(Collider2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -97,11 +97,11 @@ public class MeatballMorty : MonoBehaviour
         }
     }
 
-    private bool shouldDieFromCollision(Collider2D collision)
+    protected override bool shouldDieFromCollision(Collider2D collision)
     {
         PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
-        if(bullet){
+        if(bullet && gameObject.activeInHierarchy){
             bullet.hit();
             enemyHealth.decrement();
             health = enemyHealth.getHealth();

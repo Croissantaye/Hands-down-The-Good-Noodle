@@ -76,12 +76,12 @@ public class BasicEnemy : MonoBehaviour
     //    move(direction);
     // }
 
-    protected void move(Vector2 direction)
+    protected virtual void move(Vector2 direction)
     {
        rb.position = rb.position + (direction * speed * Time.deltaTime);
     }
 
-    protected void OnTriggerEnter2D(Collider2D collider) 
+    protected virtual void OnTriggerEnter2D(Collider2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -89,7 +89,7 @@ public class BasicEnemy : MonoBehaviour
         }
     }
 
-    private bool shouldDieFromCollision(Collider2D collision)
+    protected virtual bool shouldDieFromCollision(Collider2D collision)
     {
         // PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
