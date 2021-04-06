@@ -84,6 +84,8 @@ public class PlayerPlatformerController : PhysicsObject
 
     public void Hurt(){
         playerHealth.decrement();
+        if(GetCurrentHealth() <= 0)
+            Die();
         if(gameObject.activeInHierarchy)
             StartCoroutine(hurtEffect());
     }
