@@ -5,17 +5,17 @@ using UnityEngine;
 
 public class MeatballMorty : BasicEnemy
 {
-    private Rigidbody2D rb;
+    // private Rigidbody2D rb;
     private CircleCollider2D collision;
     private float circumference;
-    private SpriteRenderer spriteRenderer;
-    private Color normalColor;
-    private Color hurtColor;
-    private HealthSystem enemyHealth;
-    public int maxHealth = 3;
-    public int health = 3;
-    private Vector2 startPos;
-    public float speed;
+    // private SpriteRenderer spriteRenderer;
+    // private Color normalColor;
+    // private Color hurtColor;
+    // private HealthSystem enemyHealth;
+    // public int maxHealth = 3;
+    // public int health = 3;
+    [SerializeField] private Vector2 startPos;
+    public float MortySpeed;
 
     public int unitsMoved;
 
@@ -32,6 +32,7 @@ public class MeatballMorty : BasicEnemy
         collision = GetComponent<CircleCollider2D>();
         enemyHealth = GetComponent<HealthSystem>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        speed = MortySpeed;
 
         normalColor = spriteRenderer.color;
         hurtColor = Color.yellow;
@@ -84,10 +85,10 @@ public class MeatballMorty : BasicEnemy
        MortyRoll(oldPos);
     }
 
-    // protected override void move(Vector2 direction)
-    // {
-    //    rb.position = rb.position + (direction * speed * Time.deltaTime);
-    // }
+    protected override void move(Vector2 direction)
+    {
+       rb.position = rb.position + (direction * speed * Time.deltaTime);
+    }
 
     protected override void OnTriggerEnter2D(Collider2D collider) 
     {
