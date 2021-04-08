@@ -8,15 +8,10 @@ public class Checkpoint : MonoBehaviour
     private static LevelManager LevelManager;
     private bool hasBeenActivated;
     private int playerHealth;
-    private SpriteRenderer spriteRenderer;
-    [SerializeField] private Sprite OffState;
-    [SerializeField] private Sprite OnState;
     // Start is called before the first frame update
     void Start()
     {
         LevelManager = FindObjectOfType<LevelManager>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = OffState;
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
@@ -24,7 +19,6 @@ public class Checkpoint : MonoBehaviour
         if(player && !hasBeenActivated){
             playerPosition = player.GetRBPosition();
             hasBeenActivated = true;
-            spriteRenderer.sprite = OnState;
             playerHealth = player.GetCurrentHealth();
             LevelManager.setLastCheckpoint(this);
         }
