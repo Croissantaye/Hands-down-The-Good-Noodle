@@ -165,4 +165,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPos: {x: 0, y: 0}
   MortySpeed: 3
+  MortyHealth: 3
   unitsMoved: 3

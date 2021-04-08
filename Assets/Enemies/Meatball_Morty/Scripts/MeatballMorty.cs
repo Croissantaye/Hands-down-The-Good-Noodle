@@ -16,6 +16,7 @@ public class MeatballMorty : BasicEnemy
     // public int health = 3;
     [SerializeField] private Vector2 startPos;
     public float MortySpeed;
+    public int MortyHealth;
 
     public int unitsMoved;
 
@@ -37,8 +38,8 @@ public class MeatballMorty : BasicEnemy
         normalColor = spriteRenderer.color;
         hurtColor = Color.yellow;
 
-        enemyHealth.setAll(maxHealth);
-        health = maxHealth;
+        enemyHealth.setAll(MortyHealth);
+        health = enemyHealth.getHealth();
 
         startPos = transform.position;
 
