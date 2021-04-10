@@ -7,32 +7,33 @@ public class Pistol : Weapon
 {
     private PlayerAimWeapon aim;
     [SerializeField] private Projectile bullet;
-    [SerializeField] private float pistolSpeed;
-    [SerializeField] private int BulletNum;
 
     // Start is called before the first frame update
     void Start()
     {
         aim = gameObject.GetComponentInChildren<PlayerAimWeapon>();
-        ammo = 12;
-        speed = pistolSpeed;
-        numProjectiles = BulletNum;
+        curAmmoCount = ammo;
+        canShoot = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(curAmmoCount <= 0){
+            canShoot = false;
+        }
     }
 
     private void OnEnable()
     {
         PlayerPlatformerController.Shoot += fire;
+        PlayerPlatformerController.Reload += reload;
     }
 
     private void OnDisable()
     {
         PlayerPlatformerController.Shoot -= fire;
+        PlayerPlatformerController.Reload -= reload;
     }
 
 
@@ -40,17 +41,27 @@ public class Pistol : Weapon
     ///Inherited from Weapon/Parent
     protected override void fire()
     {
-        // Debug.Log("fire pistol");
-
-        Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
-        Vector3 direction = aim.getAimDirection();
-        temp.Setup(direction, speed);
-        temp = null;
+        if(canShoot){
+            Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
+            Vector3 direction = aim.getAimDirection();
+            temp.Setup(direction, speed);
+            temp = null;
+            curAmmoCount--;
+            Debug.Log("PISTOL ammo left: " + curAmmoCount);
+        }
     }
 
     protected override void reload()
     {
-        Debug.Log("reload");
+        // Debug.Log("reload pistol");
+        StartCoroutine(ReloadPistol());
+    }
+
+    private IEnumerator ReloadPistol(){
+        yield return new WaitForSeconds(reloadTime);
+        curAmmoCount = ammo;
+        canShoot = true;
+        // Debug.Log("Done reloading");
     }
 
 }

@@ -11,11 +11,13 @@ public class Checkpoint : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     [SerializeField] private Sprite OffState;
     [SerializeField] private Sprite OnState;
+    private AudioSource audioPlayer;
     // Start is called before the first frame update
     void Start()
     {
         LevelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioPlayer = GetComponent<AudioSource>();
         spriteRenderer.sprite = OffState;
     }
 
@@ -25,6 +27,7 @@ public class Checkpoint : MonoBehaviour
             playerPosition = player.GetRBPosition();
             hasBeenActivated = true;
             spriteRenderer.sprite = OnState;
+            audioPlayer.Play();
             playerHealth = player.GetCurrentHealth();
             LevelManager.setLastCheckpoint(this);
         }

@@ -2,134 +2,129 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_BehaviorScrimmy : MonoBehaviour
+public class Enemy_BehaviorScrimmy : BasicEnemy
 {
-    [SerializeField]
-    float MoveSpeed;
-    [SerializeField]
-    float JumpHeight;
-    [SerializeField]
-    float PatrolLimit;
-    [SerializeField]
-    float Pause;
+    [Header("Numeric values")]
+    [SerializeField] private int scrimmyHealth;
+    [SerializeField] private float Pause;
+    [SerializeField] [Range(.1f, 10f)] private float jumpHeight;
+    [SerializeField] [Range(.1f, 3f)] private float HorizontalSpeed;
+    [SerializeField] [Range(.1f, 10f)] private float jumpTime;
+    [SerializeField] [Range(1, 10)] private int jumpNumber;
+    [SerializeField] private bool IsLookingLeft;
 
-    private Rigidbody2D rb2d;
-    private bool MoveRight;
-    private bool MoveUp;
-    private Vector2 StartPos;
-    private Vector2 dir;
-    private Vector2 LeftLimit;
-    private Vector2 RightLimit;
-    private Vector2 UpLimit;
+    [Header("Check for ground")]
+    [SerializeField] private Transform GroundCheck; 
+
+    //private variables 
+    private ContactFilter2D contactFilter;
+    private Vector2 velocity;
+    private float jumpForce;
+    private int jumpCounter;
+    private bool canJump;
+    private bool charging;
+    private Animator animator;
+
+    enum movementState{
+        InAir,
+        OnGround
+    }
+    private movementState currentMovementState;
+
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        rb2d = GetComponent<Rigidbody2D>();
-        StartPos = transform.position;
-        LeftLimit = new Vector2(StartPos.x - PatrolLimit, StartPos.y);
-        RightLimit = new Vector2(StartPos.x + PatrolLimit, StartPos.y);
-        UpLimit = new Vector2(StartPos.x, StartPos.y + JumpHeight);
-        dir = Vector2.zero;
-        MoveUp = true;
-        MoveRight = true;
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        enemyHealth = GetComponent<HealthSystem>();
+        animator = GetComponent<Animator>();
+        enemyHealth.setAll(scrimmyHealth);
+
+        currentMovementState = movementState.OnGround;
+
+        jumpForce = (transform.position.y + jumpHeight) - transform.position.y + (.5f * Physics2D.gravity.magnitude);
+
+        velocity = new Vector2(HorizontalSpeed, jumpForce);
+        canJump = false;
+        jumpCounter = 0;
+        charging = false;
+
+        normalColor = spriteRenderer.color;
+        
+        HorizontalSpeed *= -1;
+        if(!IsLookingLeft){
+            flipDirection();
+        }
+
+        contactFilter.useTriggers = false;
+        contactFilter.SetLayerMask(LayerMask.GetMask("foreground"));
+        contactFilter.useLayerMask = true;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        Vector2 oldPosition = rb2d.position;
-
-        //If moving to the right
-        if (MoveRight)
-        {
-            Debug.Log("Scrimmy R");
-            dir = Vector2.right;
-            //If scrimmy has made it to the patrol limit to the right
-            if (rb2d.position.x >= RightLimit.x)
-            {
-                //If Scrimmy must move up
-                if (MoveUp)
-                {
-                    if (rb2d.position.y >= UpLimit.y)
-                    {
-                        MoveUp = false;
-                        dir = Vector2.down;
-                    }
-                    else
-                    {
-                        Debug.Log("Scrimmy RU");
-                        rb2d.position = new Vector2(RightLimit.x, rb2d.position.y);
-                        dir = Vector2.up;
-                    }
-                }
-            }
-            else
-            {
-                if (rb2d.position.y > StartPos.y)
-                {
-                    dir = Vector2.down;
-                }
-                else
-                {
-                    Debug.Log("Scrimmy RDL");
-                    dir = Vector2.left;
-                    MoveUp = true;
-                    MoveRight = false;
-                    StartCoroutine(PauseOnGround());
-                }
-               
-            }
+    void Update(){
+        if(CheckGround() && !charging){
+            StartCoroutine(PauseOnGround());
         }
-        if (!MoveRight)
-        {
-            Debug.Log("Scrimmy L");
-            dir = Vector2.left;
-            if(rb2d.position.x <= LeftLimit.x)
-            {
-                if (MoveUp)
-                {
-                    if (rb2d.position.y >= UpLimit.y)
-                    {
-                        MoveUp = false;
-                        dir = Vector2.down;
-                    }
-                    else
-                    {
-                        Debug.Log("Scrimmy LU");
-                        rb2d.position = new Vector2(LeftLimit.x, rb2d.position.y);
-                        dir = Vector2.up;
-                    }
-                }
-                else
-                {
-                    if(rb2d.position.y > StartPos.y)
-                    {
-                        dir = Vector2.down;
-                    }
-                    else
-                    {
-                        Debug.Log("Scrimmy DLR");
-                        dir = Vector2.right;
-                        MoveUp = true;
-                        MoveRight = true;
-                        StartCoroutine(PauseOnGround());
-                    }
-
-                }
-            }
+        if(jumpCounter >= jumpNumber){
+            jumpCounter = 0;
+            flipDirection();
         }
-
-        move(dir);
+        // Debug.Log(velocity);
     }
 
-    void move(Vector2 DIR)
-    {
-        rb2d.position = rb2d.position + (DIR * MoveSpeed * Time.deltaTime);
+    private void FixedUpdate() {
+        if(canJump){
+            move(velocity);
+            // currentMovementState = movementState.InAir;
+            canJump = false;
+            jumpCounter++;
+        }
     }
-
+    protected override void move(Vector2 direction)
+    {
+        rb.AddForce(direction, ForceMode2D.Impulse);
+        velocity = Vector2.zero;
+    }
 
     IEnumerator PauseOnGround(){
+        // Debug.Log(transform.position);
+        charging = true;
+        animator.SetBool("charging", true);
         yield return new WaitForSeconds(Pause);
+        canJump = true;
+        velocity = new Vector2(HorizontalSpeed, jumpForce);
+        animator.SetBool("charging", false);
+        // buffer so the coroutine doesn't start right away
+        yield return new WaitForSeconds(.1f);
+        charging = false;
+    }
+
+    // should only be called in FixedUpdate because of physics
+    private bool CheckGround()
+    {
+        bool hitGround;
+        hitGround = Physics2D.OverlapCircle(GroundCheck.position, .1f, LayerMask.GetMask("ground"));
+        return hitGround;
+    }
+
+    protected void flipDirection()
+    {
+        // flip  from left to right
+        if(!spriteRenderer.flipX){
+            spriteRenderer.flipX = true;
+            HorizontalSpeed *= -1;
+        }
+        // flip from right to left
+        else{
+            spriteRenderer.flipX = false;
+            HorizontalSpeed *= -1;
+        }
+    }
+ enum FaceDirection
+    {
+        Left,
+        Right
     }
 }
 

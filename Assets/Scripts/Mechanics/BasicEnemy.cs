@@ -79,17 +79,16 @@ public class BasicEnemy : MonoBehaviour
     protected virtual void move(Vector2 direction)
     {
        rb.position = rb.position + (direction * speed * Time.deltaTime);
+       // Debug.Log(direction);
     }
 
-    protected virtual void OnTriggerEnter2D(Collider2D collider) 
+    protected virtual void OnCollisionEnter2D(Collision2D collision) 
     {
-        if(shouldDieFromCollision(collider))
-        {
-            Die();
-        }
+        // Debug.Log("Enemy triggerEnter2D");
+        // Debug.Log(collision.ToString());
     }
 
-    protected virtual bool shouldDieFromCollision(Collider2D collision)
+    protected virtual bool shouldDieFromCollision(Collision2D collision)
     {
         // PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
@@ -98,11 +97,7 @@ public class BasicEnemy : MonoBehaviour
         //     return true;
         // }
         if(bullet && !bullet.IsEnemyProjectile()){
-            bullet.hit();
-            enemyHealth.decrement();
-            health = enemyHealth.getHealth();
-            if(this.gameObject.activeInHierarchy)
-                StartCoroutine(hurtEffect());
+            bullet.hit();enemyHealth.decrement();
             if(enemyHealth.getHealth() <= 0)
                 return true;
         }
@@ -112,6 +107,17 @@ public class BasicEnemy : MonoBehaviour
     private void Die() {
         Debug.Log("enemy died");
         gameObject.SetActive(false);
+    }
+
+    public void Hurt(){
+        enemyHealth.decrement();
+        Debug.Log(enemyHealth.getHealth());
+        if(enemyHealth.getHealth() == 0){
+            Die();
+        }
+        else{
+            StartCoroutine(hurtEffect());
+        }
     }
 
     IEnumerator hurtEffect(){

@@ -65,7 +65,7 @@ public class Paulie_Penne : BasicEnemy
         List<RaycastHit2D> results = new List<RaycastHit2D>(16);
         // Debug.DrawRay(transform.position, GetDirection(), Color.blue, 1f);
         int hitNum = Physics2D.Raycast(transform.position, GetDirection(), contactFilter, results, RangeOfSight);
-        Debug.Log(hitNum);
+        //Debug.Log(hitNum);
         if(hitNum > 0){
             Debug.Log("player seen");
             // Debug.DrawLine(transform.position, results[0].point, Color.blue, coolDownTime);

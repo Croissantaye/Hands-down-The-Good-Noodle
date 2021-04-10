@@ -32,6 +32,7 @@ public class PlayerPlatformerController : PhysicsObject
     private Shotgun shotgun;
     public delegate void FireWeapon();
     public static event FireWeapon Shoot;
+    public static event FireWeapon Reload;
 
     //private Animator animator;
 
@@ -125,6 +126,12 @@ public class PlayerPlatformerController : PhysicsObject
             if (Shoot != null)
             {
                 Shoot();
+            }
+        }
+
+        if(Input.GetButtonDown("reload")){
+            if(Shoot != null){
+                Reload();
             }
         }
 
