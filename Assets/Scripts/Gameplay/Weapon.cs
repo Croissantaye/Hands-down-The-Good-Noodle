@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    protected int ammo;
-    protected float speed;
-    protected int numProjectiles;
+    [SerializeField] protected int ammo;
+    [SerializeField] protected float speed;
+    [SerializeField] protected int numProjectiles;
+    protected int curAmmoCount;
+    [SerializeField] protected int reloadTime;
+    protected bool canShoot;
 
     protected virtual void fire()
     {

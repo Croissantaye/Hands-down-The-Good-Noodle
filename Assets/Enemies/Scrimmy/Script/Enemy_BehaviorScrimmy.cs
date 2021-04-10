@@ -4,62 +4,58 @@ using UnityEngine;
 
 public class Enemy_BehaviorScrimmy : BasicEnemy
 {
-    [SerializeField]
-    float MoveSpeed;
-    [SerializeField]
-    float JumpHeight;
-    [SerializeField]
-    float PatrolLimit;
-    [SerializeField]
-    float Pause;
+    [Header("Numeric values")]
+    [SerializeField] private int scrimmyHealth;
+    [SerializeField] private float Pause;
+    [SerializeField] [Range(.1f, 10f)] private float jumpHeight;
+    [SerializeField] [Range(.1f, 3f)] private float HorizontalSpeed;
+    [SerializeField] [Range(.1f, 10f)] private float jumpTime;
+    [SerializeField] [Range(1, 10)] private int jumpNumber;
+    [SerializeField] private bool IsLookingLeft;
 
-    private Rigidbody2D rb2d;
-    // private bool MoveRight;
-    // private bool MoveUp;
-    private Vector2 StartPos;
-    private Vector2 dir;
-    private Vector2 LeftLimit;
-    private Vector2 RightLimit;
-    private Vector2 UpLimit;
-    
-    private bool ChargingJump;
-    private FaceDirection LookDirection;
-    [SerializeField]
-    private bool IsLookingLeft;
+    [Header("Check for ground")]
+    [SerializeField] private Transform GroundCheck; 
+
+    //private variables 
     private ContactFilter2D contactFilter;
+    private Vector2 velocity;
+    private float jumpForce;
+    private int jumpCounter;
+    private bool canJump;
+    private bool charging;
+    private Animator animator;
 
     enum movementState{
-        Charging,
-        Jumping,
-        Falling,
-        Landing
+        InAir,
+        OnGround
     }
     private movementState currentMovementState;
-    //private SpriteRenderer spriteRenderer;
 
     // Start is called before the first frame update
     protected override void Start()
     {
-        rb2d = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        StartPos = transform.position;
-        LeftLimit = new Vector2(StartPos.x - PatrolLimit, StartPos.y);
-        RightLimit = new Vector2(StartPos.x + PatrolLimit, StartPos.y);
-        UpLimit = new Vector2(StartPos.x, StartPos.y + JumpHeight);
-        dir = Vector2.zero;
-        // MoveUp = true;
-        // MoveRight = true;
-        ChargingJump = true;
-        currentMovementState = movementState.Charging;
-        if (!IsLookingLeft)
-        {
-            LookDirection = FaceDirection.Right;
+        enemyHealth = GetComponent<HealthSystem>();
+        animator = GetComponent<Animator>();
+        enemyHealth.setAll(scrimmyHealth);
+
+        currentMovementState = movementState.OnGround;
+
+        jumpForce = (transform.position.y + jumpHeight) - transform.position.y + (.5f * Physics2D.gravity.magnitude);
+
+        velocity = new Vector2(HorizontalSpeed, jumpForce);
+        canJump = false;
+        jumpCounter = 0;
+        charging = false;
+
+        normalColor = spriteRenderer.color;
+        
+        HorizontalSpeed *= -1;
+        if(!IsLookingLeft){
             flipDirection();
         }
-        else
-        {
-            LookDirection = FaceDirection.Left;
-        }
+
         contactFilter.useTriggers = false;
         contactFilter.SetLayerMask(LayerMask.GetMask("foreground"));
         contactFilter.useLayerMask = true;
@@ -67,80 +63,62 @@ public class Enemy_BehaviorScrimmy : BasicEnemy
 
     // Update is called once per frame
     void Update(){
-        if(currentMovementState == movementState.Charging){
+        if(CheckGround() && !charging){
             StartCoroutine(PauseOnGround());
         }
-        else if(currentMovementState == movementState.Jumping){
-            if(transform.position.y < UpLimit.y){
-                dir.x = .25f;
-                dir.y = 10f;
-            }
-            else{
-                dir.y = 0f;
-                currentMovementState = movementState.Falling;
-            }
+        if(jumpCounter >= jumpNumber){
+            jumpCounter = 0;
+            flipDirection();
         }
-        else if(currentMovementState == movementState.Falling){
-            if(CheckGround()){
-                currentMovementState = movementState.Landing;
-            }
-        }
-        else{
-            currentMovementState = movementState.Charging;
-        }
+        // Debug.Log(velocity);
     }
 
     private void FixedUpdate() {
-        if(currentMovementState != movementState.Charging)
-            move(dir);
+        if(canJump){
+            move(velocity);
+            // currentMovementState = movementState.InAir;
+            canJump = false;
+            jumpCounter++;
+        }
     }
-
-    protected override void move(Vector2 DIR)
+    protected override void move(Vector2 direction)
     {
-        rb2d.position = rb2d.position + (DIR * MoveSpeed * Time.deltaTime);
-        // Debug.Log(dir);
+        rb.AddForce(direction, ForceMode2D.Impulse);
+        velocity = Vector2.zero;
     }
-
 
     IEnumerator PauseOnGround(){
-        Debug.Log("PauseOnGround");
+        // Debug.Log(transform.position);
+        charging = true;
+        animator.SetBool("charging", true);
         yield return new WaitForSeconds(Pause);
-        currentMovementState = movementState.Jumping;
+        canJump = true;
+        velocity = new Vector2(HorizontalSpeed, jumpForce);
+        animator.SetBool("charging", false);
+        // buffer so the coroutine doesn't start right away
+        yield return new WaitForSeconds(.1f);
+        charging = false;
     }
 
+    // should only be called in FixedUpdate because of physics
     private bool CheckGround()
     {
-        bool onGround;
-        
-        // Debug.Log(GetDirection());
-        List<RaycastHit2D> results = new List<RaycastHit2D>(16);
-        // Debug.DrawRay(transform.position, GetDirection(), Color.blue, 1f);
-       // RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, .01f);
-        int hitnum = Physics2D.Raycast(transform.position, Vector2.down, contactFilter, results, .5f);
-
-        if (hitnum > 0)
-        {
-            onGround = true;
-            Debug.Log("onGround");
-        }
-        else
-        {
-            onGround = false;
-        }
-        return onGround;
+        bool hitGround;
+        hitGround = Physics2D.OverlapCircle(GroundCheck.position, .1f, LayerMask.GetMask("ground"));
+        return hitGround;
     }
-
 
     protected void flipDirection()
     {
-        if (spriteRenderer.flipX) {
-            spriteRenderer.flipX = false;
-            LookDirection = FaceDirection.Left;
-        }
-        else
-        {
+        // flip  from left to right
+        if(!spriteRenderer.flipX){
             spriteRenderer.flipX = true;
-            LookDirection = FaceDirection.Right;
+            HorizontalSpeed *= -1;
+        }
+        // flip from right to left
+        else{
+            spriteRenderer.flipX = false;
+            HorizontalSpeed *= -1;
         }
     }
  enum FaceDirection

@@ -44,6 +44,11 @@ public class Projectile : MonoBehaviour
         if(other.gameObject.name == "Tilemap_LevelMap"){
             hit();
         }
+        BasicEnemy enemy = other.gameObject.GetComponent<BasicEnemy>();
+        if(enemy){
+            enemy.Hurt();
+            hit();
+        }
     }
 
     public virtual bool IsEnemyProjectile(){

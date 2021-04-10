@@ -66,7 +66,7 @@ public class MeatballMorty : BasicEnemy
                 rb.position = new Vector2(leftLimit, rb.position.y);
                 direction = Vector2.right;
                 faceLeft = false;
-                spriteRenderer.flipY = true;
+                spriteRenderer.flipX = true;
             }
         }
         if (!faceLeft)
@@ -77,7 +77,7 @@ public class MeatballMorty : BasicEnemy
                 rb.position = new Vector2(rightLimit, rb.position.y);
                 direction = Vector2.left;
                 faceLeft = true;
-                spriteRenderer.flipY = false;
+                spriteRenderer.flipX = false;
             }
         }
 
@@ -91,7 +91,7 @@ public class MeatballMorty : BasicEnemy
        rb.position = rb.position + (direction * speed * Time.deltaTime);
     }
 
-    protected override void OnTriggerEnter2D(Collider2D collider) 
+    protected override void OnCollisionEnter2D(Collision2D collider) 
     {
         if(shouldDieFromCollision(collider))
         {
@@ -99,7 +99,7 @@ public class MeatballMorty : BasicEnemy
         }
     }
 
-    protected override bool shouldDieFromCollision(Collider2D collision)
+    protected override bool shouldDieFromCollision(Collision2D collision)
     {
         PlayerPlatformerController player = collision.gameObject.GetComponent<PlayerPlatformerController>();
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
