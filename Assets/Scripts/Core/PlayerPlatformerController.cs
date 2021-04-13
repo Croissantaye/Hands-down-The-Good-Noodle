@@ -83,6 +83,10 @@ public class PlayerPlatformerController : PhysicsObject
         return playerHealth.getHealth();
     }
 
+    public HealthSystem GetHealthSystem(){
+        return playerHealth;
+    }
+
     public void Hurt(){
         playerHealth.decrement();
         if(GetCurrentHealth() <= 0)
