@@ -6,9 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class PlayerPlatformerController : PhysicsObject
 {
-    public delegate void OnKillPlayer();
-    public static event OnKillPlayer Killed;
-
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
@@ -21,6 +18,7 @@ public class PlayerPlatformerController : PhysicsObject
     private GrappleSystem grapple;
 
     private Rigidbody2D rb;
+    private PlayerAimWeapon Aim;
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
@@ -30,6 +28,9 @@ public class PlayerPlatformerController : PhysicsObject
     
     private Pistol pistol;
     private Shotgun shotgun;
+
+    public delegate void OnKillPlayer();
+    public static event OnKillPlayer Killed;
     public delegate void FireWeapon();
     public static event FireWeapon Shoot;
     public static event FireWeapon Reload;
@@ -46,6 +47,7 @@ public class PlayerPlatformerController : PhysicsObject
         rb = GetComponent<Rigidbody2D>();
         pistol = GetComponent<Pistol>();
         shotgun = GetComponent<Shotgun>();
+        Aim = gameObject.transform.Find("Arm").gameObject.GetComponent<PlayerAimWeapon>();
     }
 
     void Start() {
@@ -61,11 +63,22 @@ public class PlayerPlatformerController : PhysicsObject
             shotgun.enabled = false;
             // Debug.Log("Switch to pistol");
         }
-        else if(weapon = shotgun){
+        else if(weapon == shotgun){
             shotgun.enabled = true;
             pistol.enabled = false;
             // Debug.Log("Switch to shotgun");
         }
+    }
+    public void DisableWeapons(){
+        Aim.enabled = false;
+        pistol.enabled = false;
+        shotgun.enabled = false;
+    }
+
+    public void EnableWeapons(){
+        Aim.enabled = true;
+        pistol.enabled = true;
+        shotgun.enabled = true;
     }
 
     public Rigidbody2D GetPlayerRB(){

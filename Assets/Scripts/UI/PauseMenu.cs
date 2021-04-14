@@ -6,11 +6,14 @@ public class PauseMenu : MonoBehaviour
 {
     public static bool IsGamePaused = false;
     public GameObject pauseMenuUI;
+    [SerializeField] private GameObject player;
+    private PlayerPlatformerController playerController;
     
     
     public void Resume()
         {
             pauseMenuUI.SetActive(false);
+            playerController.EnableWeapons();
             Time.timeScale = 1f;
             IsGamePaused = false;
         }
@@ -18,6 +21,7 @@ public class PauseMenu : MonoBehaviour
         public void Pause()
         {
             pauseMenuUI.SetActive(true);
+            playerController.DisableWeapons();
             Time.timeScale = 0;
             IsGamePaused = true;
         }
@@ -29,7 +33,7 @@ public class PauseMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerController = player.GetComponent<PlayerPlatformerController>();
     }
 
     // Update is called once per frame

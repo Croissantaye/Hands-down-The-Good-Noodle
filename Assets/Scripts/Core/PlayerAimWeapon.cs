@@ -12,7 +12,7 @@ public class PlayerAimWeapon : MonoBehaviour
     }
     private Transform aimTransform;
     [SerializeField] private Transform gunPoint;
-    [SerializeField] private Transform crosshair;
+    // [SerializeField] private Transform crosshair;
 
     private Vector3 aimDirection;
     private Vector3 mousePosition;
@@ -38,7 +38,7 @@ public class PlayerAimWeapon : MonoBehaviour
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0f;
         Aiming();
-        UpdateCrosshair();
+        // UpdateCrosshair();
     }
 
     private void Aiming(){
@@ -48,9 +48,9 @@ public class PlayerAimWeapon : MonoBehaviour
         Debug.DrawLine(transform.position, mousePosition, Color.cyan);
     }
 
-    private void UpdateCrosshair(){
-        crosshair.position = mousePosition;
-    }
+    // private void UpdateCrosshair(){
+    //     crosshair.position = mousePosition;
+    // }
 
     private void Shooting(){
         if(Input.GetMouseButtonDown(0)){
