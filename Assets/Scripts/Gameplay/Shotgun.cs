@@ -42,7 +42,7 @@ public class Shotgun : Weapon
 
 
     ///Inherited from Weapon/Parent
-    protected override void fire()
+    protected override void fire(int curAmmo, int maxAmmo)
     {
         if(canShoot){
             // Debug.Log("fire shotgun");
@@ -61,11 +61,12 @@ public class Shotgun : Weapon
                 temp = null;
             }
             curAmmoCount -= numProjectiles;
-            Debug.Log("SHOTGUN ammo left: " + curAmmoCount);
+            RaiseFired(GetCurrentAmmo(), GetMaxAmmo());
+            // Debug.Log("SHOTGUN ammo left: " + curAmmoCount);
         }
     }
 
-    protected override void reload()
+    protected override void reload(int a, int b)
     {
         // Debug.Log("reload pistol");
         StartCoroutine(ReloadShotgun());
@@ -74,6 +75,7 @@ public class Shotgun : Weapon
     private IEnumerator ReloadShotgun(){
         yield return new WaitForSeconds(reloadTime);
         curAmmoCount = ammo;
+        RaiseReloaded(GetCurrentAmmo(), GetMaxAmmo());
         canShoot = true;
         // Debug.Log("Done reloading");
     }

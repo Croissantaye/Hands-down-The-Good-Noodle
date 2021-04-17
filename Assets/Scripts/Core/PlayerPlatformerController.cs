@@ -6,9 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class PlayerPlatformerController : PhysicsObject
 {
-    public delegate void OnKillPlayer();
-    public static event OnKillPlayer Killed;
-
     public float maxSpeed = 7f;
     public float jumpTakeoffSpeed = 7f;
     public float shiftModifier = 1.5f;
@@ -21,6 +18,7 @@ public class PlayerPlatformerController : PhysicsObject
     private GrappleSystem grapple;
 
     private Rigidbody2D rb;
+    private PlayerAimWeapon Aim;
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
@@ -28,11 +26,17 @@ public class PlayerPlatformerController : PhysicsObject
     public Vector2 ropeHook;
     public float swingForce = 47f;
     
+    private Weapon currentWeapon;
     private Pistol pistol;
     private Shotgun shotgun;
-    public delegate void FireWeapon();
+
+    public delegate void OnKillPlayer(int health);
+    public static event OnKillPlayer Killed;
+    public static event OnKillPlayer Hurt;
+    public delegate void FireWeapon(int ammo, int maxAmmo);
     public static event FireWeapon Shoot;
     public static event FireWeapon Reload;
+    public static event FireWeapon Change;
 
     //private Animator animator;
 
@@ -46,26 +50,50 @@ public class PlayerPlatformerController : PhysicsObject
         rb = GetComponent<Rigidbody2D>();
         pistol = GetComponent<Pistol>();
         shotgun = GetComponent<Shotgun>();
+        Aim = gameObject.transform.Find("Arm").gameObject.GetComponent<PlayerAimWeapon>();
     }
 
     void Start() {
         playerHealth = GetComponent<HealthSystem>();
         playerHealth.setAll(maxHealth);
         pistol.enabled = true;
+        currentWeapon = pistol;
         shotgun.enabled = false;
+        // Debug.Log(shotgun.GetCurrentAmmo());
+        // shotgun.enabled = false;
     }
 
     private void ChangeWeapon(Weapon weapon){
         if(weapon == pistol){
             pistol.enabled = true;
             shotgun.enabled = false;
+            currentWeapon = pistol;
             // Debug.Log("Switch to pistol");
         }
-        else if(weapon = shotgun){
+        else if(weapon == shotgun){
             shotgun.enabled = true;
             pistol.enabled = false;
+            currentWeapon = shotgun;
             // Debug.Log("Switch to shotgun");
         }
+        if(Change != null){
+            Change(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
+        }
+    }
+
+    public void ResetGrapple(){
+        grapple.DestroyRope();
+    }
+    public void DisableWeapons(){
+        Aim.enabled = false;
+        pistol.enabled = false;
+        shotgun.enabled = false;
+    }
+
+    public void EnableWeapons(){
+        Aim.enabled = true;
+        pistol.enabled = true;
+        shotgun.enabled = true;
     }
 
     public Rigidbody2D GetPlayerRB(){
@@ -83,8 +111,15 @@ public class PlayerPlatformerController : PhysicsObject
         return playerHealth.getHealth();
     }
 
-    public void Hurt(){
+    public HealthSystem GetHealthSystem(){
+        return playerHealth;
+    }
+
+    public void hurt(){
         playerHealth.decrement();
+        if(Hurt != null){
+            Hurt(playerHealth.getHealth());
+        }
         if(GetCurrentHealth() <= 0)
             Die();
         if(gameObject.activeInHierarchy)
@@ -96,6 +131,9 @@ public class PlayerPlatformerController : PhysicsObject
         Vector2 move = Vector2.zero;
 
         move.x = Input.GetAxis("Horizontal");
+        if(grapple.IsRopeOut()){
+            velocity.y = 0;
+        }
 
         if(Input.GetButtonDown("Jump") && grounded)
         {
@@ -103,15 +141,16 @@ public class PlayerPlatformerController : PhysicsObject
         }
         else if(Input.GetButtonUp("Jump"))
         {
+            if(grapple.IsRopeOut()){
+                velocity.y = jumpTakeoffSpeed;
+                grapple.DestroyRope();
+            }
             if(velocity.y > 0)
             {
                 velocity.y = velocity.y * .5f;
             }
         }
-        if(grapple.GetIsRopeOut()){
-            move.y = 0f;
-            velocity.y = 0f;
-        }
+        
 
         if(Input.GetButtonDown("Fire3") && canRun)
         {
@@ -125,13 +164,13 @@ public class PlayerPlatformerController : PhysicsObject
         if(Input.GetMouseButtonDown(0)){
             if (Shoot != null)
             {
-                Shoot();
+                Shoot(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
             }
         }
 
         if(Input.GetButtonDown("reload")){
             if(Shoot != null){
-                Reload();
+                Reload(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
             }
         }
 
@@ -163,23 +202,27 @@ public class PlayerPlatformerController : PhysicsObject
             // print(hitPoint.normal);
             // Vector2 bounce = new Vector2(hitPoint.normal.x, .7f);
             // rb2D.velocity = bounce.normalized * 5;
-            rb2D.AddForce(hitPoint.normal * 2, ForceMode2D.Impulse);
+            // rb2D.AddForce(hitPoint.normal * 2, ForceMode2D.Impulse);
             //print("Velocity after " + rb2D.velocity);
-            float dotResult = Vector2.Dot(hitPoint.normal, Vector2.up);
-            bool isOnTop;
-            if(dotResult > .5f){
-                isOnTop = true;
-            }
-            else{
-                isOnTop = false;
-            }
-            if(!isInvincible && !isOnTop) {
+            // float dotResult = Vector2.Dot(hitPoint.normal, Vector2.up);
+            // bool isOnTop;
+            // if(dotResult > .5f){
+            //     isOnTop = true;
+            // }
+            // else{
+            //     isOnTop = false;
+            // }
+            // if(!isInvincible && !isOnTop) {
+            if(!isInvincible){
                 playerHealth.decrement();
                 // print("Player hit. Health: " + playerHealth.getHealth());
                 if(playerHealth.getHealth() <= 0){
                     Die();
                 }
                 else{
+                    if(Hurt != null){
+                        Hurt(playerHealth.getHealth());
+                    }
                     StartCoroutine(hurtEffect());
                 }
             }
@@ -194,8 +237,9 @@ public class PlayerPlatformerController : PhysicsObject
 
     public void Die(){
         // gameObject.SetActive(false);
-        if(Killed != null){
-            Killed();
+        if(Killed != null && Hurt != null){
+            Killed(playerHealth.getMaxHealth());
+            Hurt(playerHealth.getMaxHealth());
         }
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }

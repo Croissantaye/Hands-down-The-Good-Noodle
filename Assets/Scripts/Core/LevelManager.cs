@@ -31,14 +31,12 @@ public class LevelManager : MonoBehaviour
         
     }
 
-    public void Respawn(){
+    public void Respawn(int health){
         Debug.Log("Respawn");
+        player.ResetGrapple();
         Rigidbody2D playerRB = player.GetPlayerRB();
         playerRB.position = lastCheckpoint.GetPlayerPosition();
-        if(player.GetCurrentHealth() <= lastCheckpoint.GetPlayerHealth())
-            player.SetCurrenthealth(lastCheckpoint.GetPlayerHealth());
-        else
-            player.SetCurrenthealth(player.GetCurrentHealth());
+        player.SetCurrenthealth(health);
         playerRB.velocity = Vector3.zero;
     }
     public void setLastCheckpoint(Checkpoint cp){

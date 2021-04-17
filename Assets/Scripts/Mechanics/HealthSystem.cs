@@ -14,6 +14,10 @@ public class HealthSystem : MonoBehaviour{
         return health;
     }
 
+    public int getMaxHealth(){
+        return maxHealth;
+    }
+
     public void setHealth(int h){
         if(health < maxHealth)
             health = h;

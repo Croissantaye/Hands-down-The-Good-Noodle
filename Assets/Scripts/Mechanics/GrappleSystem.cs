@@ -24,6 +24,7 @@ public class GrappleSystem : MonoBehaviour
     private Vector2 mousePosition;
     private RaycastHit2D grapplePoint;
     public float rappelSpeed;
+    [Range (.1f, 50f)] public float ropeRange;
     public LayerMask grappleLayer;
     private ContactFilter2D contactFilter;
     private List<RaycastHit2D> hitPoints = new List<RaycastHit2D>(16);
@@ -58,16 +59,16 @@ public class GrappleSystem : MonoBehaviour
         mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = mousePosition - (Vector2)body.position;
         hitPoints.Clear();
-        numberOfHitPoints = Physics2D.Raycast(body.position, direction, contactFilter, hitPoints);
+        numberOfHitPoints = Physics2D.Raycast(body.position, direction, contactFilter, hitPoints, ropeRange);
         // Debug.Log(numberOfHitPoints);
         if(numberOfHitPoints > 0){
+            Debug.Log("Rope hit");
             isRopeOut = true;
             rope.enabled = true;
             rope.distance = (hitPoints[0].point - (Vector2)body.position).magnitude;
             rope.connectedBody.position = hitPoints[0].point;
         }
         else{
-            isRopeOut = false;
             DestroyRope();
         }
     }
@@ -81,12 +82,13 @@ public class GrappleSystem : MonoBehaviour
         ropeVisual.SetPositions(linePoints);
     }
 
-    private void DestroyRope(){
+    public void DestroyRope(){
+        isRopeOut = false;
         ropeVisual.enabled = false;
         rope.enabled = false;
     }
 
-    public bool GetIsRopeOut(){
+    public bool IsRopeOut(){
         return isRopeOut;
     }
 }

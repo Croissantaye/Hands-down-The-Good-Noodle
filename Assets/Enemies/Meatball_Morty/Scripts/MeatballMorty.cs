@@ -18,7 +18,7 @@ public class MeatballMorty : BasicEnemy
     public float MortySpeed;
     public int MortyHealth;
 
-    public int unitsMoved;
+    public float unitsMoved;
 
     private bool faceLeft;
 

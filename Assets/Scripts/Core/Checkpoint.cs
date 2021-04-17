@@ -28,7 +28,7 @@ public class Checkpoint : MonoBehaviour
             hasBeenActivated = true;
             spriteRenderer.sprite = OnState;
             audioPlayer.Play();
-            playerHealth = player.GetCurrentHealth();
+            playerHealth = player.GetHealthSystem().getMaxHealth();
             LevelManager.setLastCheckpoint(this);
         }
     }
