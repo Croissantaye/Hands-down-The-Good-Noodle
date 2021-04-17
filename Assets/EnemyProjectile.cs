@@ -8,7 +8,7 @@ public class EnemyProjectile : Projectile
     {
         PlayerPlatformerController player = other.gameObject.GetComponent<PlayerPlatformerController>();
         if(player){
-            player.Hurt();
+            player.hurt();
             hit();
         }
         else if(other.gameObject.name == "Tilemap_LevelMap"){

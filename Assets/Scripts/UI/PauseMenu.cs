@@ -18,13 +18,13 @@ public class PauseMenu : MonoBehaviour
             IsGamePaused = false;
         }
 
-        public void Pause()
-        {
-            pauseMenuUI.SetActive(true);
-            playerController.DisableWeapons();
-            Time.timeScale = 0;
-            IsGamePaused = true;
-        }
+    public void Pause()
+    {
+        pauseMenuUI.SetActive(true);
+        playerController.DisableWeapons();
+        Time.timeScale = 0;
+        IsGamePaused = true;
+    }
     public void QuitGame()
     {
         Debug.Log("Quit Game");

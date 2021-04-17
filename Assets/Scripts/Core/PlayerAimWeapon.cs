@@ -45,7 +45,7 @@ public class PlayerAimWeapon : MonoBehaviour
         aimDirection = (mousePosition - transform.position).normalized;
         float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         aimTransform.eulerAngles =  new Vector3(0, 0, angle);
-        Debug.DrawLine(transform.position, mousePosition, Color.cyan);
+        // Debug.DrawLine(transform.position, mousePosition, Color.cyan);
     }
 
     // private void UpdateCrosshair(){

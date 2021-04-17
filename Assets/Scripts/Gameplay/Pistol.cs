@@ -26,6 +26,7 @@ public class Pistol : Weapon
 
     private void OnEnable()
     {
+        // PlayerPlatformerController.Shoot(curAmmoCount, maxAmmo) += fire;
         PlayerPlatformerController.Shoot += fire;
         PlayerPlatformerController.Reload += reload;
     }
@@ -39,7 +40,7 @@ public class Pistol : Weapon
 
 
     ///Inherited from Weapon/Parent
-    protected override void fire()
+    protected override void fire(int curAmmo, int maxAmmo)
     {
         if(canShoot){
             Projectile temp = Instantiate(bullet, aim.getGunPoint().position, Quaternion.identity);
@@ -47,19 +48,22 @@ public class Pistol : Weapon
             temp.Setup(direction, speed);
             temp = null;
             curAmmoCount--;
-            Debug.Log("PISTOL ammo left: " + curAmmoCount);
+            RaiseFired(GetCurrentAmmo(), GetMaxAmmo());
+            // Debug.Log("PISTOL ammo left: " + curAmmoCount);
         }
     }
 
-    protected override void reload()
+    protected override void reload(int a, int b)
     {
         // Debug.Log("reload pistol");
         StartCoroutine(ReloadPistol());
     }
 
     private IEnumerator ReloadPistol(){
+        // Debug.Log("Current ammo left: " + curAmmoCount);
         yield return new WaitForSeconds(reloadTime);
         curAmmoCount = ammo;
+        RaiseReloaded(GetCurrentAmmo(), GetMaxAmmo());
         canShoot = true;
         // Debug.Log("Done reloading");
     }
