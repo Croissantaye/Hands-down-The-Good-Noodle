@@ -122,9 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8d550348cb4449469a7a045ac06686a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 0
-  canDie: 1
-  speed: 0
   scrimmyHealth: 8
   Pause: 1
   jumpHeight: 3
