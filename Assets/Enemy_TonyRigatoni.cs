@@ -17,6 +17,9 @@ public class Enemy_TonyRigatoni : BasicEnemy
     [SerializeField] [Range (.1f, 20f)] float sightRange;
     [SerializeField] float jumpForce;
 
+    public delegate void EnemyEvent();
+    public static event EnemyEvent TonyDeath;
+
     private void OnEnable() {
         PlayerPlatformerController.Killed += reset;
     }
@@ -108,5 +111,13 @@ public class Enemy_TonyRigatoni : BasicEnemy
         transform.position = startPosition;
         transform.rotation = startRotation;
         direction = Vector3.zero;
+    }
+
+    protected override void Die()
+    {
+        base.Die();
+        if(TonyDeath != null){
+            TonyDeath();
+        }
     }
 }

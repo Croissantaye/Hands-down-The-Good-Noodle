@@ -14,6 +14,7 @@ public class BasicEnemy : MonoBehaviour
     [SerializeField] protected int maxHealth;
     protected int health;
     [SerializeField] protected bool canDie;
+
     // private Vector2 startPos;
     [SerializeField] [Range (.1f, 20f)] protected float speed;
 
@@ -105,7 +106,7 @@ public class BasicEnemy : MonoBehaviour
         return false;
     }
 
-    private void Die() {
+    protected virtual void Die() {
         Debug.Log("enemy died");
         gameObject.SetActive(false);
     }

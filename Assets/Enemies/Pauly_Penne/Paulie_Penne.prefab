@@ -202,10 +202,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d012fa68578a6f94e914679d3e7c10ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 0
+  canDie: 1
+  speed: 0
   collisionBox: {fileID: 5853823435847967383}
   coolDownTime: 0.5
   bullet: {fileID: 7867287314856974854, guid: 32fb2c79b5117c4479b45040766b17a3, type: 3}
-  FaceLeft: 1
+  FaceLeft: 0
   bulletSpeed: 10
   PaulieMaxHealth: 3
   RangeOfSight: 25
