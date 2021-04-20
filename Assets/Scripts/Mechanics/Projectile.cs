@@ -5,7 +5,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     protected Vector3 direction;
-    protected float speed;
+    [SerializeField] protected float speed;
     protected Rigidbody2D rb2d;
 
     public void Setup(Vector3 dir, float s){

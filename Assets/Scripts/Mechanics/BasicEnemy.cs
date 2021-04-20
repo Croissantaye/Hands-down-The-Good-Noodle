@@ -11,10 +11,12 @@ public class BasicEnemy : MonoBehaviour
     protected Color normalColor;
     protected Color hurtColor;
     protected HealthSystem enemyHealth;
-    protected int maxHealth;
+    [SerializeField] protected int maxHealth;
     protected int health;
+    [SerializeField] protected bool canDie;
+
     // private Vector2 startPos;
-    protected float speed;
+    [SerializeField] [Range (.1f, 20f)] protected float speed;
 
     // public int unitsMoved;
 
@@ -78,7 +80,7 @@ public class BasicEnemy : MonoBehaviour
 
     protected virtual void move(Vector2 direction)
     {
-       rb.position = rb.position + (direction * speed * Time.deltaTime);
+       rb.position = rb.position + (direction * speed * Time.fixedDeltaTime);
        // Debug.Log(direction);
     }
 
@@ -104,19 +106,21 @@ public class BasicEnemy : MonoBehaviour
         return false;
     }
 
-    private void Die() {
+    protected virtual void Die() {
         Debug.Log("enemy died");
         gameObject.SetActive(false);
     }
 
     public void Hurt(){
-        enemyHealth.decrement();
-        Debug.Log(enemyHealth.getHealth());
-        if(enemyHealth.getHealth() == 0){
-            Die();
-        }
-        else{
-            StartCoroutine(hurtEffect());
+        if(canDie){
+            enemyHealth.decrement();
+            // Debug.Log(enemyHealth.getHealth());
+            if(enemyHealth.getHealth() == 0){
+                Die();
+            }
+            else{
+                StartCoroutine(hurtEffect());
+            }
         }
     }
 
