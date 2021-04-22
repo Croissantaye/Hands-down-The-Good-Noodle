@@ -107,7 +107,7 @@ public class BasicEnemy : MonoBehaviour
     }
 
     protected virtual void Die() {
-        Debug.Log("enemy died");
+        // Debug.Log("enemy died");
         gameObject.SetActive(false);
     }
 
