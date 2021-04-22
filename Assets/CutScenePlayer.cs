@@ -16,8 +16,11 @@ public class CutScenePlayer : MonoBehaviour
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
+        if(Input.GetButton("Skip")){
+            IsPlaying = false;
+        }
         if((ulong)videoPlayer.frame + 1 >= videoPlayer.frameCount){
             IsPlaying = false;
         }

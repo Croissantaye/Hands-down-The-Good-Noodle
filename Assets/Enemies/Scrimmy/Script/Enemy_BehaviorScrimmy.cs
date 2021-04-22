@@ -29,7 +29,7 @@ public class Enemy_BehaviorScrimmy : BasicEnemy
         InAir,
         OnGround
     }
-    private movementState currentMovementState;
+    // private movementState currentMovementState;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -40,7 +40,7 @@ public class Enemy_BehaviorScrimmy : BasicEnemy
         animator = GetComponent<Animator>();
         enemyHealth.setAll(scrimmyHealth);
 
-        currentMovementState = movementState.OnGround;
+        // currentMovementState = movementState.OnGround;
 
         jumpForce = (transform.position.y + jumpHeight) - transform.position.y + (.5f * Physics2D.gravity.magnitude);
 

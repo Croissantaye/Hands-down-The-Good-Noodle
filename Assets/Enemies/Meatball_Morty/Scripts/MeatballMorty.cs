@@ -114,7 +114,8 @@ public class MeatballMorty : BasicEnemy
         return false;
     }
 
-    void Die() {
+    protected override void Die() {
+        // base.Die();
         gameObject.SetActive(false);
     }
 

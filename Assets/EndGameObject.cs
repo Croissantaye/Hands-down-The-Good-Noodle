@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class EndGameObject : MonoBehaviour
 {
-    private bool IsBossDead;
+    // private bool IsBossDead;
     private BoxCollider2D collision;
     private SpriteRenderer spriteRenderer;
 
@@ -20,7 +20,7 @@ public class EndGameObject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        IsBossDead = false;
+        // IsBossDead = false;
         collision = gameObject.GetComponent<BoxCollider2D>();
         collision.enabled = false;
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -28,7 +28,7 @@ public class EndGameObject : MonoBehaviour
     }
 
     private void OnBossDeath(){
-        IsBossDead = true;
+        // IsBossDead = true;
         collision.enabled = true;
         spriteRenderer.enabled = true;
     }
