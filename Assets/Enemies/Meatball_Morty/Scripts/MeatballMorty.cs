@@ -105,6 +105,7 @@ public class MeatballMorty : BasicEnemy
         Projectile bullet = collision.gameObject.GetComponent<Projectile>();
         if(bullet && gameObject.activeInHierarchy){
             bullet.hit();
+            // playAudio(enemyHurt);
             enemyHealth.decrement();
             health = enemyHealth.getHealth();
             StartCoroutine(hurtEffect());
@@ -115,8 +116,8 @@ public class MeatballMorty : BasicEnemy
     }
 
     protected override void Die() {
-        // base.Die();
-        gameObject.SetActive(false);
+        base.Die();
+        // gameObject.SetActive(false);
     }
 
     IEnumerator hurtEffect(){
