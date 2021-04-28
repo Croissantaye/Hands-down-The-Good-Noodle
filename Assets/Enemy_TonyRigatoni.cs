@@ -8,6 +8,7 @@ public class Enemy_TonyRigatoni : BasicEnemy
 {
     private Animator animator;
     private Vector3 direction;
+    private Vector3 slowDirection;
     public Transform Feet;
     public Transform Wall;
     private LayerMask wallMask;
@@ -16,7 +17,15 @@ public class Enemy_TonyRigatoni : BasicEnemy
     private Quaternion startRotation;
     [SerializeField] [Range (.1f, 20f)] float sightRange;
     [SerializeField] float jumpForce;
+    private BossPhase currentPhase;
+    private float timeLastSeenPlayer;
+    [SerializeField] private float phaseTimer;
 
+    enum BossPhase
+    {
+        Looking,
+        Jumping
+    }
     public delegate void EnemyEvent();
     public static event EnemyEvent TonyDeath;
 
@@ -37,17 +46,38 @@ public class Enemy_TonyRigatoni : BasicEnemy
         playerFilter.useLayerMask = true;
         startPosition = transform.position;
         startRotation = transform.rotation;
+        currentPhase = BossPhase.Looking;
+        timeLastSeenPlayer = Time.time;
     }
 
     private void Update() {
         if(CheckForWall()){
             flipEnemy();
         }
+
+        if(Time.time - timeLastSeenPlayer > phaseTimer){
+            currentPhase = BossPhase.Jumping;
+        }
+        else{
+            currentPhase = BossPhase.Looking;
+        }
     }
 
     private void FixedUpdate() {
-        base.move(direction);
-        lookForPlayer();
+        Vector3 dir = executePhase();
+        base.move(dir);
+    }
+
+    private Vector3 executePhase(){
+        if(currentPhase == BossPhase.Looking){
+            lookForPlayer();
+            return direction;
+        }
+        else if(currentPhase == BossPhase.Jumping){
+            jumping();
+            return slowDirection;
+        }
+        return direction;
     }
 
     private bool CheckFeet(){
@@ -66,6 +96,7 @@ public class Enemy_TonyRigatoni : BasicEnemy
     
     public void SetDirection(Vector3 vec){
         direction = vec;
+        slowDirection = new Vector3(direction.x / 2, direction.y, direction.z);
     }
 
     public void SetCanDie(bool d){
@@ -82,6 +113,7 @@ public class Enemy_TonyRigatoni : BasicEnemy
             if(CheckFeet())
                 jumpToPlayer(results[0].point);
             results.Clear();
+            timeLastSeenPlayer = Time.time;
         }
         return true;
     }
@@ -99,9 +131,19 @@ public class Enemy_TonyRigatoni : BasicEnemy
         rb.velocity = new Vector2(direction.x * speed * Time.fixedDeltaTime, initialVerticalForce + jumpBuffer);
     }
 
+    private void jumping(){
+        if(CheckFeet()){
+            rb.velocity = new Vector2(direction.x * speed * Time.fixedDeltaTime, jumpForce);
+        }
+        if(lookForPlayer()){
+            currentPhase = BossPhase.Looking;
+        }
+    }
+
     private void flipEnemy(){
         transform.RotateAround(transform.position, Vector3.up, 180);
         direction = direction * -1;
+        slowDirection = slowDirection * -1;
     }
 
     private void reset(int a){

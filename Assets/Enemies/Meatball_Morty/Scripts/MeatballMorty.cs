@@ -64,9 +64,10 @@ public class MeatballMorty : BasicEnemy
             if(rb.position.x <= leftLimit)
             {
                 rb.position = new Vector2(leftLimit, rb.position.y);
-                direction = Vector2.right;
-                faceLeft = false;
-                spriteRenderer.flipX = true;
+                // direction = Vector2.right;
+                // faceLeft = false;
+                // spriteRenderer.flipX = true;
+                Flip();
             }
         }
         if (!faceLeft)
@@ -75,15 +76,23 @@ public class MeatballMorty : BasicEnemy
             if (rb.position.x >= rightLimit)
             {
                 rb.position = new Vector2(rightLimit, rb.position.y);
-                direction = Vector2.left;
-                faceLeft = true;
-                spriteRenderer.flipX = false;
+                // direction = Vector2.left;
+                // faceLeft = true;
+                // spriteRenderer.flipX = false;
+                Flip();
             }
         }
 
        //print(faceLeft);
        move(direction);
        MortyRoll(oldPos);
+       CheckWall();
+    }
+
+    private void Flip(){
+        direction = direction * -1;
+        faceLeft = !faceLeft;
+        spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 
     protected override void move(Vector2 direction)
@@ -93,9 +102,13 @@ public class MeatballMorty : BasicEnemy
 
     protected override void OnCollisionEnter2D(Collision2D collider) 
     {
+        MeatballMorty enemy = collider.gameObject.GetComponent<MeatballMorty>();
         if(shouldDieFromCollision(collider))
         {
             Die();
+        }
+        if(enemy){
+            Flip();
         }
     }
 
@@ -134,5 +147,15 @@ public class MeatballMorty : BasicEnemy
         float degrees = ratio * 360;
         // Debug.Log(x);
         transform.Rotate(Vector3.forward, -degrees);
+    }
+
+    private void CheckWall(){
+        Debug.DrawRay(transform.position, direction, Color.red);
+        // List<RaycastHit2D> results = new List<RaycastHit2D>(16);
+        RaycastHit2D hit2D = Physics2D.Raycast(transform.position, direction, .63f, LayerMask.GetMask("player", "ground"));
+        if(hit2D){
+            Debug.DrawLine(transform.position, hit2D.point, Color.cyan, .5f);
+            Flip();
+        }
     }
 }

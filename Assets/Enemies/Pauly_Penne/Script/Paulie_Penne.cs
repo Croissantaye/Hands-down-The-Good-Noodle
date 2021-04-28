@@ -14,6 +14,7 @@ public class Paulie_Penne : BasicEnemy
     // private Vector3 gunPointLeft;
     // private Vector3 gunpointRight;
     [SerializeField] private bool FaceLeft;
+    [SerializeField] private bool CanFlip;
     private FaceDireciton faceDireciton;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private int PaulieMaxHealth = 3;
@@ -21,6 +22,9 @@ public class Paulie_Penne : BasicEnemy
     [SerializeField] [Range (.1f, 100f)] private float RangeOfSight = 25f;
     private ContactFilter2D contactFilter;
     private bool PlayerSeen;
+    private bool flipDirection;
+    private float flipTimer;
+    private float randomTimerRange;
 
     protected override void Start(){
         rb = GetComponent<Rigidbody2D>();
@@ -45,6 +49,10 @@ public class Paulie_Penne : BasicEnemy
             FlipDirection();
         }
 
+        flipDirection = false;
+        flipTimer = Time.time;
+        randomTimerRange = Random.Range(2f, 5f);
+
         PlayerSeen = false;
         contactFilter.useTriggers = false;
         contactFilter.SetLayerMask(LayerMask.GetMask("player"));
@@ -58,6 +66,19 @@ public class Paulie_Penne : BasicEnemy
         if(PlayerSeen){
             shoot();
         }
+        if(CanFlip){
+            if(!flipDirection){
+                if(Time.time - flipTimer > randomTimerRange){
+                    flipTimer = Time.time;
+                    flipDirection = true;
+                }
+            }
+            else{
+                FlipDirection();
+                flipDirection = false;
+                randomTimerRange = Random.Range(2f, 5f);
+            }
+        }
     }
 
     private void LineOfSight(){
@@ -70,6 +91,7 @@ public class Paulie_Penne : BasicEnemy
             Debug.Log("player seen");
             // Debug.DrawLine(transform.position, results[0].point, Color.blue, coolDownTime);
             PlayerSeen = true;
+            flipTimer = Time.time;
             results.Clear();
         }
     }    
