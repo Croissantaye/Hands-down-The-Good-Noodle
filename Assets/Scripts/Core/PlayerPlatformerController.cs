@@ -19,6 +19,7 @@ public class PlayerPlatformerController : PhysicsObject
 
     private Rigidbody2D rb;
     private PlayerAimWeapon Aim;
+    private SpriteRenderer armSprite;
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
@@ -35,6 +36,10 @@ public class PlayerPlatformerController : PhysicsObject
     public AudioClip playerReload;
     public AudioClip playerSwitch;
     private AudioSource playerSound;
+
+    [Header("Arm Sprites")]
+    public Sprite RightArm;
+    public Sprite LeftArm;
     
     private Weapon currentWeapon;
     private Pistol pistol;
@@ -62,6 +67,8 @@ public class PlayerPlatformerController : PhysicsObject
         shotgun = GetComponent<Shotgun>();
         playerSound = GetComponent<AudioSource>();
         Aim = gameObject.transform.Find("Arm").gameObject.GetComponent<PlayerAimWeapon>();
+        armSprite = gameObject.transform.Find("Arm").gameObject.GetComponent<SpriteRenderer>();
+        armSprite.sprite = RightArm;
     }
 
     void Start() {
@@ -74,9 +81,31 @@ public class PlayerPlatformerController : PhysicsObject
         // shotgun.enabled = false;
     }
 
+    public float getMaxSpeed(){
+        return maxSpeed;
+    }
+
+    public void setMaxSpeed(float s){
+        maxSpeed = s;
+    }
+
     public void playAudio(AudioClip sound){
         playerSound.clip = sound;
         playerSound.Play();
+    }
+
+    private void Flip(Vector3 rotate){
+        // Debug.Log("FLIP");
+
+        transform.Rotate(Vector3.up, 180f, Space.World);
+        if(transform.rotation.eulerAngles.y == 0){
+            armSprite.sprite = RightArm;
+            gameObject.transform.Find("Arm").gameObject.transform.Rotate(new Vector3(0f, 180f, 0f), Space.Self);
+        }
+        else{
+            armSprite.sprite = LeftArm;
+            gameObject.transform.Find("Arm").gameObject.transform.Rotate(new Vector3(0f, 180f, 0f), Space.Self);
+        }
     }
 
     private void ChangeWeapon(Weapon weapon){
@@ -150,6 +179,7 @@ public class PlayerPlatformerController : PhysicsObject
     protected override void ComputeVelocity()
     {
         Vector2 move = Vector2.zero;
+        float horizontalVelocity = rb.velocity.x;
 
         move.x = Input.GetAxis("Horizontal");
         if(grapple.IsRopeOut()){
@@ -175,7 +205,6 @@ public class PlayerPlatformerController : PhysicsObject
                 velocity.y = velocity.y * .5f;
             }
         }
-        
 
         if(Input.GetButtonDown("Fire3") && canRun)
         {
@@ -210,16 +239,19 @@ public class PlayerPlatformerController : PhysicsObject
             ChangeWeapon(shotgun);
         }
 
-        // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
-        // if(flipSprite)
-        // {
-        //     spriteRenderer.flipX = !spriteRenderer.flipX;
-        // }
-
         // animator.SetBool("grounded", grounded);
         // animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
         targetVelocity = move * maxSpeed;
+        
+        if(Input.GetAxisRaw("Horizontal") > 0 && transform.rotation.eulerAngles.y%360 != 0){
+            Vector3 faceLeft = new Vector3(0f, 180f, 0f);
+            Flip(faceLeft);
+        }
+        else if(Input.GetAxisRaw("Horizontal") < 0 && transform.rotation.eulerAngles.y%360 == 0){
+            Vector3 faceRight = new Vector3(0f, 0f, 0f);
+            Flip(faceRight);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D other) {
