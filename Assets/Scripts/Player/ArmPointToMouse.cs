@@ -5,7 +5,8 @@ using UnityEngine;
 public class ArmPointToMouse : MonoBehaviour
 {
     private Transform arm;
-    [Range(30f, 60f)] public float ArmRotationAngleMax;
+    // USED WHEN LIMITING ANGLE OF ROTATION FOR ARM
+    // [Range(30f, 179f)] public float ArmRotationAngleMax;
 
     // Start is called before the first frame update
     void Start()
@@ -19,10 +20,9 @@ public class ArmPointToMouse : MonoBehaviour
         Vector3 armToMouse = getArmDirection();
         // rotate arm to match armToMouse
         float angle = Mathf.Atan2(armToMouse.y, armToMouse.x) * Mathf.Rad2Deg;
-        // Debug.Log(angle);
-        // Debug.Log(arm.parent.localScale.x);
-        // Debug.Log(AbsoluteValueOfAngle(angle));
-        transform.rotation = Quaternion.AngleAxis(AbsoluteValueOfAngle(angle), Vector3.forward);
+
+        // transform.rotation = Quaternion.AngleAxis(AbsoluteValueOfAngle(angle), Vector3.forward);
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     public Vector3 getArmDirection(){
@@ -32,16 +32,17 @@ public class ArmPointToMouse : MonoBehaviour
         return (mousePosition - arm.position);
     }
 
-    private float AbsoluteValueOfAngle(float angle){
-        float absAngle;
-        if(arm.parent.localScale.x > 0){
-            absAngle = Mathf.Clamp(angle, -ArmRotationAngleMax, ArmRotationAngleMax);
-        }
-        else{
-            absAngle = (-1 * Mathf.Sign(angle)) * (Mathf.Abs(angle) - 180);
-            absAngle = Mathf.Clamp(absAngle, -ArmRotationAngleMax, ArmRotationAngleMax);
-            absAngle = Mathf.Sign(absAngle) * (180 - Mathf.Abs(absAngle));
-        }
-        return absAngle;
-    }
+    // USED WHEN WANTING TO LIMIT THE ANGLE OF ROTATION ON ARM
+    // private float AbsoluteValueOfAngle(float angle){
+    //     float absAngle;
+    //     if(arm.parent.localScale.x > 0){
+    //         absAngle = Mathf.Clamp(angle, -ArmRotationAngleMax, ArmRotationAngleMax);
+    //     }
+    //     else{
+    //         absAngle = (-1 * Mathf.Sign(angle)) * (Mathf.Abs(angle) - 180);
+    //         absAngle = Mathf.Clamp(absAngle, -ArmRotationAngleMax, ArmRotationAngleMax);
+    //         absAngle = Mathf.Sign(absAngle) * (180 - Mathf.Abs(absAngle));
+    //     }
+    //     return absAngle;
+    // }
 }
