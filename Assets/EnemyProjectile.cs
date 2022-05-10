@@ -20,4 +20,11 @@ public class EnemyProjectile : Projectile
     {
         return true;
     }
+
+    public override void Setup(Vector3 dir, float s){
+        speed = s;
+        this.direction = dir;
+        transform.eulerAngles = new Vector3(0, 0, GetAngleFromVectorFloat(direction));
+        Destroy(gameObject, 3f);
+    }
 }

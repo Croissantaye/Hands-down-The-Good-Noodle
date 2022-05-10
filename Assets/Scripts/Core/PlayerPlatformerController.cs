@@ -19,12 +19,27 @@ public class PlayerPlatformerController : PhysicsObject
 
     private Rigidbody2D rb;
     private PlayerAimWeapon Aim;
+    private SpriteRenderer armSprite;
     private SpriteRenderer spriteRenderer;
     private Color hurtColor = Color.yellow;
     private Color normalColor;
 
     public Vector2 ropeHook;
     public float swingForce = 47f;
+
+    [Header("Sounds")]
+    public AudioClip playerDeath;
+    public AudioClip playerJump;
+    public AudioClip playerHurt;
+    public AudioClip playerGrapple;
+    public AudioClip playerShoot;
+    public AudioClip playerReload;
+    public AudioClip playerSwitch;
+    private AudioSource playerSound;
+
+    [Header("Arm Sprites")]
+    public Sprite RightArm;
+    public Sprite LeftArm;
     
     private Weapon currentWeapon;
     private Pistol pistol;
@@ -50,7 +65,10 @@ public class PlayerPlatformerController : PhysicsObject
         rb = GetComponent<Rigidbody2D>();
         pistol = GetComponent<Pistol>();
         shotgun = GetComponent<Shotgun>();
+        playerSound = GetComponent<AudioSource>();
         Aim = gameObject.transform.Find("Arm").gameObject.GetComponent<PlayerAimWeapon>();
+        armSprite = gameObject.transform.Find("Arm").gameObject.GetComponent<SpriteRenderer>();
+        armSprite.sprite = RightArm;
     }
 
     void Start() {
@@ -63,21 +81,52 @@ public class PlayerPlatformerController : PhysicsObject
         // shotgun.enabled = false;
     }
 
+    public float getMaxSpeed(){
+        return maxSpeed;
+    }
+
+    public void setMaxSpeed(float s){
+        maxSpeed = s;
+    }
+
+    public void playAudio(AudioClip sound){
+        playerSound.clip = sound;
+        playerSound.Play();
+    }
+
+    private void Flip(Vector3 rotate){
+        // Debug.Log("FLIP");
+
+        transform.Rotate(Vector3.up, 180f, Space.World);
+        if(transform.rotation.eulerAngles.y == 0){
+            armSprite.sprite = RightArm;
+            gameObject.transform.Find("Arm").gameObject.transform.Rotate(new Vector3(0f, 180f, 0f), Space.Self);
+        }
+        else{
+            armSprite.sprite = LeftArm;
+            gameObject.transform.Find("Arm").gameObject.transform.Rotate(new Vector3(0f, 180f, 0f), Space.Self);
+        }
+    }
+
     private void ChangeWeapon(Weapon weapon){
-        if(weapon == pistol){
-            pistol.enabled = true;
-            shotgun.enabled = false;
-            currentWeapon = pistol;
-            // Debug.Log("Switch to pistol");
-        }
-        else if(weapon == shotgun){
-            shotgun.enabled = true;
-            pistol.enabled = false;
-            currentWeapon = shotgun;
-            // Debug.Log("Switch to shotgun");
-        }
-        if(Change != null){
-            Change(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
+        if(currentWeapon != weapon){
+            if(weapon == pistol){
+                pistol.enabled = true;
+                shotgun.enabled = false;
+                currentWeapon = pistol;
+                // Debug.Log("Switch to pistol");
+                playAudio(playerSwitch);
+            }
+            else if(weapon == shotgun){
+                shotgun.enabled = true;
+                pistol.enabled = false;
+                currentWeapon = shotgun;
+                // Debug.Log("Switch to shotgun");
+                playAudio(playerSwitch);
+            }
+            if(Change != null){
+                Change(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
+            }
         }
     }
 
@@ -116,6 +165,7 @@ public class PlayerPlatformerController : PhysicsObject
     }
 
     public void hurt(){
+        playAudio(playerHurt);
         playerHealth.decrement();
         if(Hurt != null){
             Hurt(playerHealth.getHealth());
@@ -129,6 +179,7 @@ public class PlayerPlatformerController : PhysicsObject
     protected override void ComputeVelocity()
     {
         Vector2 move = Vector2.zero;
+        float horizontalVelocity = rb.velocity.x;
 
         move.x = Input.GetAxis("Horizontal");
         if(grapple.IsRopeOut()){
@@ -137,20 +188,23 @@ public class PlayerPlatformerController : PhysicsObject
 
         if(Input.GetButtonDown("Jump") && grounded)
         {
+            playAudio(playerJump);
             velocity.y = jumpTakeoffSpeed;
         }
-        else if(Input.GetButtonUp("Jump"))
-        {
+        else if(Input.GetButton("Jump")){
+            // playAudio(playerJump);
             if(grapple.IsRopeOut()){
                 velocity.y = jumpTakeoffSpeed;
                 grapple.DestroyRope();
             }
+        }
+        else if(Input.GetButtonUp("Jump"))
+        {
             if(velocity.y > 0)
             {
                 velocity.y = velocity.y * .5f;
             }
         }
-        
 
         if(Input.GetButtonDown("Fire3") && canRun)
         {
@@ -164,11 +218,15 @@ public class PlayerPlatformerController : PhysicsObject
         if(Input.GetMouseButtonDown(0)){
             if (Shoot != null)
             {
+                if(currentWeapon.GetCurrentAmmo() > 0){
+                    playAudio(playerShoot);
+                }
                 Shoot(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
             }
         }
 
         if(Input.GetButtonDown("reload")){
+            playAudio(playerReload);
             if(Shoot != null){
                 Reload(currentWeapon.GetCurrentAmmo(), currentWeapon.GetMaxAmmo());
             }
@@ -181,16 +239,19 @@ public class PlayerPlatformerController : PhysicsObject
             ChangeWeapon(shotgun);
         }
 
-        // bool flipSprite = (spriteRenderer.flipX ? (move.x > 0.01f) : (move.x < 0.01f));
-        // if(flipSprite)
-        // {
-        //     spriteRenderer.flipX = !spriteRenderer.flipX;
-        // }
-
         // animator.SetBool("grounded", grounded);
         // animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
         targetVelocity = move * maxSpeed;
+        
+        if(Input.GetAxisRaw("Horizontal") > 0 && transform.rotation.eulerAngles.y%360 != 0){
+            Vector3 faceLeft = new Vector3(0f, 180f, 0f);
+            Flip(faceLeft);
+        }
+        else if(Input.GetAxisRaw("Horizontal") < 0 && transform.rotation.eulerAngles.y%360 == 0){
+            Vector3 faceRight = new Vector3(0f, 0f, 0f);
+            Flip(faceRight);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D other) {
@@ -214,6 +275,7 @@ public class PlayerPlatformerController : PhysicsObject
             // }
             // if(!isInvincible && !isOnTop) {
             if(!isInvincible){
+                playAudio(playerHurt);
                 playerHealth.decrement();
                 // print("Player hit. Health: " + playerHealth.getHealth());
                 if(playerHealth.getHealth() <= 0){
@@ -237,6 +299,7 @@ public class PlayerPlatformerController : PhysicsObject
 
     public void Die(){
         // gameObject.SetActive(false);
+        playAudio(playerDeath);
         if(Killed != null && Hurt != null){
             Killed(playerHealth.getMaxHealth());
             Hurt(playerHealth.getMaxHealth());

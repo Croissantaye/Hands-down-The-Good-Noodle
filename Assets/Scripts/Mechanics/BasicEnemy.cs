@@ -18,6 +18,12 @@ public class BasicEnemy : MonoBehaviour
     // private Vector2 startPos;
     [SerializeField] [Range (.1f, 20f)] protected float speed;
 
+    [Header ("Sounds")]
+    public AudioClip enemyDeath;
+    public AudioClip enemyHurt;
+    public AudioClip enemySpecificSound;
+    private AudioSource enemySound;
+
     // public int unitsMoved;
 
     // private bool faceLeft;
@@ -33,6 +39,7 @@ public class BasicEnemy : MonoBehaviour
         // collision = GetComponent<PolygonCollider2D>();
         enemyHealth = GetComponent<HealthSystem>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        enemySound = GetComponent<AudioSource>();
 
         normalColor = spriteRenderer.color;
         hurtColor = Color.yellow;
@@ -84,6 +91,11 @@ public class BasicEnemy : MonoBehaviour
        // Debug.Log(direction);
     }
 
+    public void playAudio(AudioClip sound){
+        enemySound.clip = sound;
+        enemySound.Play();
+    }
+
     protected virtual void OnCollisionEnter2D(Collision2D collision) 
     {
         // Debug.Log("Enemy triggerEnter2D");
@@ -108,6 +120,8 @@ public class BasicEnemy : MonoBehaviour
 
     protected virtual void Die() {
         // Debug.Log("enemy died");
+        // playAudio(enemyDeath);
+        // yield return new WaitForSeconds(.1f);
         gameObject.SetActive(false);
     }
 
@@ -125,6 +139,7 @@ public class BasicEnemy : MonoBehaviour
     }
 
     IEnumerator hurtEffect(){
+        // playAudio(enemyHurt);
         spriteRenderer.color = Color.yellow;
         yield return new WaitForSeconds(.5f);
         spriteRenderer.color = normalColor;

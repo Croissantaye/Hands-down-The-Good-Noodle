@@ -8,7 +8,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] protected float speed;
     protected Rigidbody2D rb2d;
 
-    public void Setup(Vector3 dir, float s){
+    public virtual void Setup(Vector3 dir, float s){
         speed = s;
         this.direction = dir;
         transform.eulerAngles = new Vector3(0, 0, GetAngleFromVectorFloat(direction));
