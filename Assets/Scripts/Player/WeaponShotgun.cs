@@ -12,17 +12,17 @@ public class WeaponShotgun : WeaponBase
         BulletsPerShot = bullets;
     }
     public override void Fire(){
-        if(ammoCount > 0){
+        if(_AmmoCount > 0){
             float bulletAngle = transform.GetChild(0).eulerAngles.z  + (SpreadAngle / 2);
             for(int i = 0; i < BulletsPerShot; i++){
                 bulletAngle *= Mathf.Deg2Rad;
                 Vector3 direction = new Vector3(Mathf.Cos(bulletAngle), Mathf.Sin(bulletAngle), 0f);
-                GameObject bullet = Instantiate(BulletPrefab, gunpoint.position, transform.rotation);
-                bullet.GetComponent<PlayerBulletMovement>().Setup(direction, BulletSpeed);
+                GameObject bullet = Instantiate(_BulletPrefab, _Gunpoint.position, transform.rotation);
+                bullet.GetComponent<PlayerBulletMovement>().Setup(direction, _BulletSpeed);
                 bulletAngle *= Mathf.Rad2Deg;
                 bulletAngle -= (SpreadAngle / BulletsPerShot);
             }
-            ammoCount--;            
+            _AmmoCount--;            
         }
     }
 

@@ -6,10 +6,10 @@ public class WeaponPistol : WeaponBase
 {
     public override void Fire()
     {
-        if(ammoCount > 0){
-            GameObject bullet = Instantiate(BulletPrefab, gunpoint.position, transform.rotation);
-            bullet.GetComponent<PlayerBulletMovement>().Setup(GetComponent<ArmPointToMouse>().transform.right, BulletSpeed);
-            ammoCount--;
+        if(_AmmoCount > 0){
+            GameObject bullet = Instantiate(_BulletPrefab, _Gunpoint.position, transform.rotation);
+            bullet.GetComponent<PlayerBulletMovement>().Setup(GetComponent<ArmPointToMouse>().transform.right, _BulletSpeed);
+            _AmmoCount--;
         }
     }
 }

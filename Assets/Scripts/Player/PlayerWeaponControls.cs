@@ -5,13 +5,15 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerWeaponControls : MonoBehaviour
 {
-    private WeaponBase CurrentWeapon;
     public enum WeaponType
     {
         pistol,
         shotgun,
         grenadeLauncher
     }
+
+    private UI_AmmoController AmmoUI;
+    private WeaponBase CurrentWeapon;
 
     private WeaponPistol _PistolComponent;
     private WeaponShotgun _ShotgunComponent;
@@ -48,6 +50,8 @@ public class PlayerWeaponControls : MonoBehaviour
         _GrenadeLauncherComponent = GetComponent<WeaponGrenadeLauncher>();
         _GrenadeLauncherComponent.WeaponSetup(GrenadeLauncherMaxAmmo, GrenadeLauncherBulletPrefab,GrenadeLauncherSprite,GrenadeLauncherBulletSpeed);
 
+        AmmoUI = Camera.main.gameObject.GetComponentInChildren<UI_AmmoController>();
+
         CurrentWeapon = GetComponent<WeaponPistol>();
         SwitchWeapon(CurrentWeaponType);
     }
@@ -57,10 +61,12 @@ public class PlayerWeaponControls : MonoBehaviour
     {
         if(Input.GetButtonDown("Fire1")){            
             CurrentWeapon.Fire();
+            AmmoUI.UpdateAmmoUI(CurrentWeapon.AmmoCount);
         }
         if(Input.GetButtonDown("Reload")){
             Debug.Log("reload");
             CurrentWeapon.Reload();
+            AmmoUI.UpdateAmmoUI(CurrentWeapon.AmmoCount, CurrentWeapon.MaxAmmo);
         }
         if(Input.GetButtonDown("Num1")){
             SwitchWeapon(WeaponType.pistol);
@@ -100,17 +106,6 @@ public class PlayerWeaponControls : MonoBehaviour
                 break;
         }
         CurrentWeapon.enabled = true;
-    }
-}
-
-public class CurrentAmmoCounts{
-    public static int PistolCurrentAmmo;
-    public static int ShotgunCurrentAmmo;
-    public static int GrenadeLauncherCurrentAmmo;
-
-    public CurrentAmmoCounts(int pistol, int shotgun, int grenadeLauncher){
-        PistolCurrentAmmo = pistol;
-        ShotgunCurrentAmmo = shotgun;
-        GrenadeLauncherCurrentAmmo = grenadeLauncher;
+        AmmoUI.UpdateAmmoUI(CurrentWeapon.WeaponSprite, CurrentWeapon.AmmoCount, CurrentWeapon.MaxAmmo);
     }
 }
